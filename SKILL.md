@@ -1,6 +1,6 @@
 ---
 name: video-forge
-description: Multi-channel AI video generation + voiceover assembly engine (fal.ai queue: Wan 3.0 / Seedance 2.0+2.5 / MiniMax H3 / Gemini Omni Flash; TTS via ElevenLabs + Volcano Doubao; ffmpeg assembly). Use whenever the user asks to generate video, 文生视频, 图生视频, 视频编辑, 配音, TTS, 口播, 短视频, BGM 混音, or mentions 视频, 视频配乐, 视频号, 抖音视频, short video, video clip, voiceover — even without saying "generate". Requires FAL_KEY (fal.ai); optional ELEVENLABS_API_KEY / VOLC_TTS_API_KEY+VOLC_TTS_APPID for voiceover; REPLICATE_API_TOKEN channel scaffolded. Zero dependencies beyond Node >= 18 (ffmpeg/ffprobe needed for assembly and duration checks). Model routing, endpoints, parameter enums and pricing live in one JSON registry — adding a model is configuration, not code.
+description: Multi-channel AI video generation + voiceover assembly engine (fal.ai queue: Wan 3.0 / Seedance 2.0+2.5 / MiniMax H3 / Gemini Omni Flash; TTS via ElevenLabs for English + Volcano Doubao seed-tts for Chinese; ffmpeg assembly). Use whenever the user asks to generate video, 文生视频, 图生视频, 视频编辑, 配音, TTS, 口播, 短视频, BGM 混音, or mentions 视频, 视频配乐, 视频号, 抖音视频, short video, video clip, voiceover — even without saying "generate". Requires FAL_KEY (fal.ai); optional ELEVENLABS_API_KEY (English voiceover) / VOLC_TTS_API_KEY (Chinese voiceover, Doubao seed-tts V3); REPLICATE_API_TOKEN channel scaffolded. Zero dependencies beyond Node >= 18 (ffmpeg/ffprobe needed for assembly and duration checks). Model routing, endpoints, parameter enums and pricing live in one JSON registry — adding a model is configuration, not code.
 ---
 
 # video-forge — Multi-Channel Video Generation + Voiceover Assembly
@@ -12,7 +12,8 @@ Model routing, endpoints, parameter enums and pricing live in one JSON registry 
 **adding a model is configuration, not code**.
 
 **Key setup**: `FAL_KEY` (fal.ai, required for video). Optional voiceover:
-`ELEVENLABS_API_KEY`, or 火山 doubles `VOLC_TTS_API_KEY` + `VOLC_TTS_APPID`.
+`ELEVENLABS_API_KEY` (English) or 火山 `VOLC_TTS_API_KEY` (Chinese, Doubao
+seed-tts V3). **配音分工：中文 → volc 通道，英文 → elevenlabs 通道。**
 Replicate channel scaffolded (`REPLICATE_API_TOKEN`). **Never write keys to any
 file, commit, document, or log.**
 
@@ -61,6 +62,7 @@ gitignored; video rows carry `est_usd`, TTS rows carry `chars`).
 3. **Model selection（用户准则 2026-10-10）**: 文生视频与视频编辑 → `wan30`；**图生视频 → `h3-max-turbo`**（i2v 首选，性价比之王）；高质感叙事 → `seedance20`/`seedance25`（贵，确认再上）；带原生音频 → `omni-flash-11`（360p $0.03/s）；2K/4K → `h3`。哑片模型配音走 gen-tts + assemble。
 4. **Generate once → validate（ffprobe 时长/分辨率/音轨）→ 交付，让用户确认再迭代。** 每次迭代 = 一次提交 + 一次反馈，不要连环重生成。
 5. **Assembly**: 默认丢弃原片音轨；`--clip-volume` 保留原生音轨（omni/带声模型混配音时用）。
+6. **Voiceover language split**: 中文配音 → `--channel volc`（豆包 seed-tts，`_uranus_bigtts` 系音色，复刻加 `--clone`）；英文配音 → `--channel elevenlabs`（免费档只能用自有 generated 音色）。
 
 ## Critical Rules
 

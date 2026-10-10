@@ -10,7 +10,7 @@
 - `[docs 2026-10-10]` H3 促销价 40% off（h3-max-turbo $0.015/s@480p）2026-10-15 截止，过期 registry 必须改价，否则账本失真。
 - `[docs 2026-10-10]` omni-flash v1 是 token 计费（输入文本/音频/视频都计 token），预算难估算——优先 omni-flash-11（按秒按分辨率透明计费）。
 - `[live 2026-10-10]` ElevenLabs 免费档实测：10,000 字符/月、月度重置、flash 系 0.5 credit/字符。
-- `[live 2026-10-10]` 火山 TTS 需要 appid+token 两个值：UUID 形状的环境变量是 openspeech token 不是 Ark key（Ark 实测 401）；缺 appid 报 code 3001。appid 是 9 位数字、非机密。
+- `[live 2026-10-10]` 火山 TTS 走 V3（`X-Api-Key` 三头鉴权，**无需 appid**）——早前"缺 appid code 3001"的结论只适用旧版 v1 端点，是我拿 Bearer 头打 v3 才误判成 key 无效。**speaker 按资源分层：uranus=seed-tts-2.0 / moon=1.0 / mars=旧版**，配错报 55000000 mismatch；全列表要 AK/SK 签名的 ListSpeakers。中文配音归豆包、英文归 ElevenLabs（用户定的分工）。
 
 ## 提示词与参数
 

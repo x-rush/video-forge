@@ -11,8 +11,8 @@ for assembly and duration checks).
 | Channel | Models | Auth | Billing | Status |
 |---|---|---|---|---|
 | fal.ai (queue API) | `wan30`, `seedance20`, `seedance25`, `h3`, `h3-max`, `h3-max-turbo`, `omni-flash`, `omni-flash-11` | `FAL_KEY` | per second × resolution ($0.015-1.16/s) | **schemas live-verified**; wan30 + h3-max-turbo full-chain live |
-| ElevenLabs (TTS) | flash/turbo/multilingual v2.5 | `ELEVENLABS_API_KEY` | free tier 10k chars/mo (library voices need paid plan via API) | live-verified (own generated voices) |
-| Volcano 火山 (TTS) | Doubao voices | `VOLC_TTS_API_KEY` + `VOLC_TTS_APPID` | per char | docs-verified, awaiting APPID |
+| ElevenLabs (TTS, English) | flash/turbo/multilingual v2.5 | `ELEVENLABS_API_KEY` | free tier 10k chars/mo (library voices need paid plan via API) | live-verified (own generated voices) |
+| Volcano 豆包 (TTS, Chinese) | seed-tts-2.0 voices (`_uranus_bigtts`) | `VOLC_TTS_API_KEY` | per char | live-verified (V3 unidirectional) |
 | Replicate (video) | scaffold | `REPLICATE_API_TOKEN` | GPU time | auth-verified; first real run pending |
 
 > fal.ai is an aggregator: vendor pricing may change (H3 promo rates end
@@ -29,10 +29,11 @@ Set keys as env vars (token-file alternatives in `models.json`):
 
 ```bash
 export FAL_KEY=...               # fal.ai, required for video
-export ELEVENLABS_API_KEY=...    # optional, voiceover
-export VOLC_TTS_API_KEY=...      # optional, 火山 TTS token
-export VOLC_TTS_APPID=...        # required with VOLC_TTS_API_KEY (9-digit, not secret)
+export ELEVENLABS_API_KEY=...    # optional, English voiceover
+export VOLC_TTS_API_KEY=...      # optional, Chinese voiceover (Doubao seed-tts V3)
 ```
+
+Voiceover language split: **Chinese → volc (Doubao), English → ElevenLabs.**
 
 ## Usage
 

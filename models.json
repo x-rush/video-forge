@@ -31,14 +31,14 @@
       "status": "live-verified 2026-10-10（自有音色全链出声）"
     },
     "volc": {
-      "description": "火山引擎语音合成（openspeech /api/v1/tts，同步 base64 返回）",
+      "description": "火山引擎豆包语音合成 V3（seed-tts unidirectional 流式；豆包负责中文配音，ElevenLabs 负责英文）",
       "auth_env": ["VOLC_TTS_API_KEY"],
-      "appid_env": "VOLC_TTS_APPID",
-      "base_url": "https://openspeech.bytedance.com/api/v1",
+      "base_url": "https://openspeech.bytedance.com/api/v3",
       "docs": "https://www.volcengine.com/docs/6561/79817",
-      "billing": "按字符计费，价格看火山控制台；免费额度以开通页为准",
-      "risk_note": "⚠️ 需要 appid+token 两个值：token=VOLC_TTS_API_KEY（Authorization: Bearer;<token>，分号是官方格式），appid=VOLC_TTS_APPID（控制台-语音技术-应用管理，9 位数字，非机密）。缺 appid 实测报 code 3001（2026-10-10 probe 实录）",
-      "status": "docs-verified 2026-10-10；UNTESTED（等 VOLC_TTS_APPID）"
+      "billing": "按字符计费，价格看火山控制台",
+      "auth_note": "鉴权三头：X-Api-Key + X-Api-Resource-Id + X-Api-Request-Id（uuid）——不是 Bearer，无需 appid；本 key 仅授权 seed-tts-2.0（1.0 实测 403 not granted）",
+      "risk_note": "chunked NDJSON 响应，data 为 base64 音频帧拼接；speaker 资源分层 mars=旧版/moon=1.0/uranus=2.0",
+      "status": "live-verified 2026-10-10（zh_female_vv_uranus_bigtts 全链出声 4.7s）"
     }
   },
   "video_models": {
@@ -231,10 +231,12 @@
       "output_format": "mp3_44100_128"
     },
     "volc": {
-      "cluster": "volcano_tts",
-      "default_voice": "zh_female_cancan_mars_bigtts",
-      "voice_note": "音色枚举以火山控制台-语音技术-音色管理页为准，--voice 覆盖",
-      "encoding": "mp3"
+      "resource_id": "seed-tts-2.0",
+      "clone_resource_id": "seed-icl-2.0",
+      "default_voice": "zh_female_vv_uranus_bigtts",
+      "voice_note": "中文配音专用（分工：豆包=zh，ElevenLabs=en）。seed-tts-2.0 配 _uranus_bigtts 系音色（_mars/_moon 系会报 55000000 resource mismatch，实测）；--voice 覆盖，复刻音色加 --clone（seed-icl-2.0）",
+      "encoding": "mp3",
+      "sample_rate": 24000
     }
   }
 }

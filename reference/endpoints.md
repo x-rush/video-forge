@@ -48,14 +48,16 @@
 - 音色：`GET /v1/voices`；⚠️ **免费档 API 禁用库音色**（premade/professional 全部 402 `paid_plan_required`，与字符余量无关）——**category=generated 的自有音色可用**（实测"阿川"全链出声 3.8s/24 字符）
 - HTTP 401 key 无效 · 402 库音色或额度 · 422 参数
 
-## 火山引擎 TTS（豆包）[docs；probe 实录 2026-10-10]
+## 火山引擎 TTS（豆包 V3 seed-tts）[live 2026-10-10]
 
-- `POST https://openspeech.bytedance.com/api/v1/tts`
-- Header：`Authorization: Bearer;<token>`（⚠️ 官方格式带**分号**）+ `Content-Type: application/json`
-- body：`{ app:{appid, token, cluster:"volcano_tts"}, user:{uid}, audio:{voice_type, encoding:"mp3", speed_ratio}, request:{reqid:uuid, text, operation:"query"} }`
-- 成功：`{ code:3000, data:"<base64 mp3>" }`；失败 code≠3000
-- ⚠️ **appid 必填**：缺 appid 实测 `{"code":3001,"message":"...Missing required: app.appid"}`；UUID 形状的 VOLC_TTS_API_KEY 是 openspeech token，**不是**方舟 Ark key（Ark 端点实测 401 "API key doesn't exist"）
-- appid = 火山控制台-语音技术-应用管理，9 位数字，非机密；音色枚举以控制台-音色管理页为准
+- 端点：`POST https://openspeech.bytedance.com/api/v3/tts/unidirectional`
+- 鉴权三头：`X-Api-Key: <VOLC_TTS_API_KEY>` + `X-Api-Resource-Id: seed-tts-2.0`（复刻音色换 `seed-icl-2.0`）+ `X-Api-Request-Id: <uuid>`——**不是 Bearer，无需 appid**（v1 的 appid+token 与本通道无关）
+- body：`{ req_params: { text, speaker }, audio_params: { format: "mp3", sample_rate: 24000 } }`
+- 响应：HTTP chunked 多段 JSON（NDJSON），每段 `data` 为 base64 音频帧，**拼接后整体解码**
+- 定位分工（用户定）：**豆包=中文配音，ElevenLabs=英文配音**
+- [live] `zh_female_vv_uranus_bigtts` 全链出声（4.7s/24 字符）；**speaker 资源分层：`_uranus_bigtts`=seed-tts-2.0，`_moon_bigtts`=1.0 系，`_mars_bigtts`=旧版 v1**——配错报 `code 55000000 resource ID is mismatched with speaker related resource`
+- [live] 本 key 仅授权 seed-tts-2.0：对 `seed-tts-1.0` 任意 speaker 均 403 `45000030 requested resource not granted`
+- 音色全列表：官方 `ListSpeakers` 控制台 API（需 AK/SK 签名，ResourceIDs=["seed-tts-2.0"]）
 
 ## 冒烟测试清单
 1. ✅ [live] fal `wan30` t2v 全链：181s 墙钟 → 854x480/5.0s/含音轨，账本 $0.25
@@ -64,6 +66,6 @@
 4. ✅ [live] ElevenLabs：库音色 402 paid_plan_required（免费档政策）→ 自有音色"阿川"出声 3.8s
 5. ✅ [live] assemble 双模式：视频+配音（0.1s）/ +BGM 闪避+fade（0.3s），5.0s 含音轨 ✓
 6. ✅ [live] Replicate 通道：422 prompt-required（鉴权+通路 ✓），限速 <$5 余额 6 次/分钟
-7. ⏸ 火山 TTS：等 VOLC_TTS_APPID
+7. ✅ [live] 火山 TTS（豆包 V3 seed-tts）：`zh_female_vv_uranus_bigtts` 出声 4.7s/24 字符；复刻通道 seed-icl-2.0 待用户有复刻音色后验
 8. ✅ [live] music-forge suno-v6 / v6-mini（另一仓库，见其 endpoints.md）
 9. ⏸ seedance/h3/omni 出片未实测（schema 已 live；首跑按预算逐个来，单发 $0.09-2.9）

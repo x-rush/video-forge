@@ -3,7 +3,8 @@
 // 用法：
 //   node gen-tts.mjs --text "大家好，欢迎收看本期节目。" --model eleven_flash_v2_5
 //   node gen-tts.mjs --text-file narration.txt --voice <voice_id> --out vo.mp3
-//   node gen-tts.mjs --channel volc --text "你好世界"          # 需 VOLC_TTS_APPID
+//   node gen-tts.mjs --channel volc --text "你好世界"          # 豆包 seed-tts V3，中文配音
+//   node gen-tts.mjs --channel volc --text "……" --clone        # 复刻音色（seed-icl-2.0）
 //   node gen-tts.mjs --list-voices                             # ElevenLabs 音色清单
 //   node gen-tts.mjs --quota                                   # ElevenLabs 余量
 //   node gen-tts.mjs --report                                  # 账本报表
@@ -63,7 +64,6 @@ async function main() {
   const voice = arg("voice") ?? ttsDef.default_voice;
   const modelId = arg("model") ?? ttsDef.default_model ?? ttsDef.default_voice;
   const speed = arg("speed") ? Number(arg("speed")) : undefined;
-
   // 预算门（TTS 按字符，两通道共月配额；超支 exit 2）
   const conf = existsSync(BUDGET) ? JSON.parse(readFileSync(BUDGET, "utf8")) : null;
   if (conf?.monthly_tts_chars) {
@@ -80,7 +80,7 @@ async function main() {
   try {
     result = channelName === "elevenlabs"
       ? await provider.synthesize({ text, apiKey, voiceId: voice, modelId, speed })
-      : await provider.synthesize({ text, apiKey, appid: process.env[providerDef.appid_env ?? ""], voiceType: voice, speed });
+      : await provider.synthesize({ text, apiKey, resource: hasFlag("clone") ? ttsDef.clone_resource_id : ttsDef.resource_id, speaker: voice, format: ttsDef.encoding ?? "mp3", sampleRate: ttsDef.sample_rate ?? 24000 });
   } catch (e) {
     die(String(e?.message ?? e));
   }
