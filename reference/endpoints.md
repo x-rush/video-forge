@@ -29,6 +29,7 @@
 | omni-flash-11 | google/gemini-omni-flash/v1.1/text-to-video | …/v1.1/image-to-video | …/v1.1/edit | $0.03/s@360p · $0.10@720p · $0.15@1080p · $0.30@4K | resolution 360p/720p/1080p/4k · aspect 16:9/9:16 · duration int |
 
 - ⚠️ 队列命名空间 = 端点**前两段**：omni-flash-1.1 的 status/response 在 `google/gemini-omni-flash/requests/{id}`，带 `/v1.1` 会 405（实测，--resume 已修）
+- **隐藏参数面 [live 2026-10-10] 批量探测实录**（非法值 + duration 保底触发 422 列举）：wan30 有 `seed:int`/`enable_prompt_expansion:bool`/`audio:bool`；seedance 双子有 `seed:int`/`generate_audio:bool`（原生音频！）；H3 全家 `seed:int`/`enable_prompt_expansion:bool`（expanded_prompt 的开关）；omni-1.1 无任何候选字段（极简 schema）；omni v1 行为不可测（本轮取消生效 499，未获数据）。已全部回填 registry，`--seed`/`--no-audio` 已 CLI 化
 - ⚠️ 探测工艺实录：非法枚举值探测对全部 8 模型有效（worker 先入队后校验，422 不扣费）——但**提交到拒绝有几秒窗口**，必须带"立即 cancel"保险；h3-max-turbo 同族内行为也可能不同（h3/h3-max 拒绝与 turbo 入队在同一轮发生）
 - hailuo-2.3 / hailuo-02 家族未入矩阵（用户指定 H3）；需要时加 JSON 即可
 

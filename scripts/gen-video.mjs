@@ -39,7 +39,8 @@ if (process.argv.includes("--help") || !process.argv[2]) {
   --resolution <档>   分辨率，枚举见各模型（默认取注册表第一档=最便宜）
   --aspect <比例>     画幅，如 16:9 / 9:16 / adaptive
   --duration <秒>     时长（数字；注册表按模型自动转 int / '6' / '6s' 形态）
-  --no-audio          关闭原生音频（仅 veo31-fast，省 1/3 费用）
+  --no-audio          关闭原生音频（veo 系 generate_audio / wan audio / seedance generate_audio）
+  --seed N            复现种子（registry 登记了 seed 的模型：wan30/seedance/H3 系）
   --negative <text>   反向提示（仅 klingv3-turbo，docs）
   --advanced-json <p> 原样合并进请求体的 JSON 文件（长尾参数逃生口）
   --out <dir>         输出目录（默认 ./video-output/<时间戳>-<别名>/）
@@ -118,10 +119,19 @@ function buildParams() {
       else die(`--duration ${wantDur} 不在 ${alias} 枚举 ${JSON.stringify(dEnum)} 内`);
     } else if (P.duration) p.duration = Math.round(wantDur);
     else die(`--duration 传入但 ${alias} 的 duration 形态未登记（docs 状态禁止盲传）`);
+    if (channel.duration_max && p.duration > channel.duration_max) die(`--duration ${p.duration} 超过 ${alias} 上限 ${channel.duration_max}s（[live] 实测）`);
   } else if (P.duration) {
     p.duration = Math.round(modelDef.default_duration ?? 5); // 已登记 duration 字段才自动下发默认时长
   }
-  if (hasFlag("no-audio") && P.generate_audio) p.generate_audio = false;
+  if (hasFlag("no-audio")) {
+    const noAudioParam = P.generate_audio ? "generate_audio" : P.audio ? "audio" : null;
+    if (noAudioParam) p[noAudioParam] = false;
+    else die(`--no-audio 传入但 ${alias} 未登记音频开关字段（audio / generate_audio）`);
+  }
+  if (P.seed && arg("seed")) {
+    const s = Number(arg("seed"));
+    p.seed = Number.isInteger(s) ? s : die("--seed 必须是整数");
+  }
   if (arg("negative") && P.negative_prompt) p.negative_prompt = arg("negative");
   if (imagePath) {
     if (!channel.image_endpoint) die(`模型 ${alias} 未登记图生视频端点`);

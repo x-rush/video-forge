@@ -24,6 +24,7 @@
 - `[live 2026-10-10]` **fal 队列命名空间 = 端点前两段**（owner/model）：omni-flash-1.1 的 status/response 在 `google/gemini-omni-flash/requests/{id}`，带 `/v1.1` 子路径 405——fal-video.mjs 的 --resume 已按此修正。
 - `[live 2026-10-10]` ElevenLabs 免费档 API **禁用库音色**（402 paid_plan_required，premade/professional 全被拒，与 10k 字符余量无关）；`category=generated` 的自有音色可正常合成。402 ≠ 额度用尽——错误文案必须透传响应体，别想当然。
 - `[live 2026-10-10]` "哑片"假设不可靠：wan30 文档未提音频，实测 t2v 输出含音轨；H3 全系实测含音轨。audio 声明以 ffprobe 实测为准。
+- `[live 2026-10-10]` **wan30 duration 上限 30s**（31 被 worker 422 "less than or equal to 30"，$0 学费）——int 型时长必须登记 duration_max 防呆；枚举型（seedance/kling/veo）天然免疫。
 - `[live 2026-10-10]` 探测/测试前先确认矩阵和预算已获用户确认——本仓库首日就因抢跑被用户叫停一次（wan30 那发已批但矩阵未确认）。
 - `[docs]` 图生视频输入：fal 各模型 image 参数名不一（多数 image_url），registry 用 image_param 字段声明；参考视频输入（edit）参数名同样未全验证，首跑小文件试水。
 - `[docs]` BGM 循环铺满用 `-stream_loop -1`；配音对齐视频恒用 `-shortest + apad` 组合（配音短补静音、配音长裁到视频长，画面永不裁）。
