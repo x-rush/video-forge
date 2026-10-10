@@ -79,9 +79,11 @@ export async function generate({ endpoint, params, apiKey, onLog = () => {}, tim
   return { task_id: request_id, video_url, raw };
 }
 
-// 按 request_id 重取（同族 endpoint 去掉末段即命名空间，如 alibaba/wan-3.0）
+// 按 request_id 重取。⚠️ fal 应用命名空间 = 端点前两段（owner/model），
+// 子路径端点（如 google/gemini-omni-flash/v1.1/text-to-video）的 ns 是 google/gemini-omni-flash
+// ——2026-10-10 实测：取"去掉末段"会 405。
 export async function resume({ request_id, endpoint, apiKey }) {
-  const ns = endpoint.split("/").slice(0, -1).join("/");
+  const ns = endpoint.split("/").slice(0, 2).join("/");
   const base = `https://queue.fal.run/${ns}/requests/${encodeURIComponent(request_id)}`;
   const r = await fetch(`${base}/status`, { headers: { Authorization: `Key ${apiKey}` }, signal: AbortSignal.timeout(15000) });
   if (r.status === 404) throw new Error(`request 不存在：${request_id}`);

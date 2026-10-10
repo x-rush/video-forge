@@ -1,5 +1,5 @@
 {
-  "$comment": "video-forge model registry. 矩阵 2026-10-10 与用户确认：wan3.0（文生+编辑优先）、seedance 2.0+2.5、minimax H3（图生视频优先，h3/h3-max/h3-max-turbo 三档）、Gemini Omni Flash + 1.1。全部走 fal 队列通道；wan30 schema 已 422-probe 实测，其余为 docs 状态（枚举首跑后回填 registry）。TTS 双通道独立，配置在 tts 段。加模型=只改这个 JSON。",
+  "$comment": "video-forge model registry. 矩阵 2026-10-10 与用户确认：wan3.0（文生+编辑优先）、seedance 2.0+2.5、minimax H3（图生视频优先，h3/h3-max/h3-max-turbo 三档）、Gemini Omni Flash + 1.1。全部走 fal 队列通道；全部模型输入 schema 已 422-probe 实测（2026-10-10，见 reference/endpoints.md）；wan30/h3-max-turbo 出片全链 live。TTS 双通道独立，配置在 tts 段。加模型=只改这个 JSON。",
   "default_provider": "fal",
   "providers": {
     "fal": {
@@ -8,8 +8,8 @@
       "base_url": "https://queue.fal.run",
       "docs": "https://fal.ai/docs",
       "billing": "按生成秒数×分辨率计费（见各模型 price_per_second；omni-flash v1 为 token 计费近似）；成功出片才扣费，422 校验拒绝不扣",
-      "risk_note": "视频单发 $0.1-3，比生图贵一个量级；月预算走 budget.mjs，超支 exit 2",
-      "status": "live-verified 2026-10-10（队列通路 + wan30 schema）"
+      "risk_note": "视频单发 $0.09-3，比生图贵一个量级；月预算走 budget.mjs，超支 exit 2",
+      "status": "live-verified 2026-10-10（队列通路 + 全部 8 模型 schema + wan30/h3-max-turbo 出片）"
     },
     "replicate": {
       "description": "Replicate 异步预测 API（POST /v1/models/<slug>/predictions + 轮询，与 image-forge 同款通路）",
@@ -18,8 +18,8 @@
       "base_url": "https://api.replicate.com/v1",
       "docs": "https://replicate.com/docs",
       "billing": "按 GPU 运行时长计费；视频模型单条约 $0.05-1，无公开按条价",
-      "risk_note": "provider 按官方文档实现、UNTESTED；首跑先用便宜模型小参数验证通路",
-      "status": "docs-verified 2026-10-10；UNTESTED"
+      "risk_note": "鉴权与校验通路已实测（2026-10-10，422 prompt-required 实录）；账户余额 <$5 时创建限速 6 次/分钟",
+      "status": "auth-verified 2026-10-10；真实生成未跑（等首单）"
     },
     "elevenlabs": {
       "description": "ElevenLabs TTS（REST，返回 mp3 二进制；免费档 10,000 字符/月）",
@@ -27,8 +27,8 @@
       "base_url": "https://api.elevenlabs.io/v1",
       "docs": "https://elevenlabs.io/docs/api-reference/text-to-speech/convert",
       "billing": "免费档 10,000 字符/月（实测 2026-10-10）；flash/turbo 系 0.5 credit/字符，multilingual_v2 1 credit/字符",
-      "risk_note": "免费档月重置，超量需付费档；中文走 multilingual/flash_v2_5 系模型",
-      "status": "live-verified 2026-10-10（订阅查询）"
+      "risk_note": "⚠️ 免费档 API 禁用库音色（402 paid_plan_required，实测）——用 --list-voices 找 category=generated 的自有音色，或升级付费档",
+      "status": "live-verified 2026-10-10（自有音色全链出声）"
     },
     "volc": {
       "description": "火山引擎语音合成（openspeech /api/v1/tts，同步 base64 返回）",
@@ -45,7 +45,7 @@
     "wan30": {
       "vendor": "Alibaba",
       "model": "Wan 3.0",
-      "best_for": "【文生视频与视频编辑优先】用户指定主力：最低价大厂模型+reference-to-video 编辑；哑片（配音走 TTS 管线）",
+      "best_for": "【文生视频与视频编辑优先】用户指定主力：最低价大厂模型+reference-to-video 编辑；实测输出含音轨",
       "default_duration": 5,
       "availability": {
         "fal": {
@@ -58,68 +58,76 @@
             "prompt": "string，必填",
             "resolution": ["480p", "720p", "1080p"],
             "aspect_ratio": ["adaptive", "16:9", "4:3", "1:1", "3:4", "9:16"],
-            "duration": "int 秒（5/10 常用档，枚举未实测）"
+            "duration": "int 秒"
           },
           "image_param": "image_url",
           "price_per_second": { "480p": 0.05, "720p": 0.1, "1080p": 0.2 },
-          "audio": false,
-          "status": "live-verified schema 2026-10-10"
+          "audio": true,
+          "audio_note": "live 实测 2026-10-10：t2v 输出含音轨（内容待试听确认）",
+          "status": "live-verified 2026-10-10（全链出片：480p×5s，854x480，181s 墙钟）"
         }
       }
     },
     "seedance20": {
       "vendor": "ByteDance",
       "model": "Seedance 2.0",
-      "best_for": "高质感档：叙事与运镜强；同族 mini 档便宜 4 倍（seedance-2.0/mini，$0.0721/s@480p）要用加一行 JSON 即可",
+      "best_for": "高质感档：叙事与运镜强，时长 4-15s；同族 mini 档便宜 4 倍（seedance-2.0/mini，$0.0721/s@480p）要用加一行 JSON 即可",
       "default_duration": 5,
       "availability": {
         "fal": {
           "endpoint": "bytedance/seedance-2.0/text-to-video",
           "image_endpoint": "bytedance/seedance-2.0/image-to-video",
           "params": {
-            "prompt": "string，必填（其余枚举 docs 待实测：同族有 resolution/duration/aspect_ratio/camera_fixed）"
+            "prompt": "string，必填",
+            "resolution": ["480p", "720p", "1080p", "4k"],
+            "duration": ["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"],
+            "aspect_ratio": ["auto", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"]
           },
           "price_per_second": { "720p": 0.3034 },
-          "price_note": "1080p 更高以控制台为准；fast 档 $0.2419/s@720p、us 档 $0.37/s@720p、mini 档 $0.0721/s@480p + $0.1547/s@720p",
-          "audio": false,
-          "status": "docs-verified 2026-10-10；枚举待实测"
+          "price_note": "4k/1080p 价未公开，实扣以控制台为准；fast $0.2419/s@720p · mini $0.0721/s@480p · us $0.37/s@720p",
+          "status": "live-verified schema 2026-10-10；出片未实测"
         }
       }
     },
     "seedance25": {
       "vendor": "ByteDance",
       "model": "Seedance 2.5",
-      "best_for": "顶配档：复杂运镜与多主体叙事；无 mini 档，价格全场最贵，谨慎使用",
+      "best_for": "顶配档：最长 30s 长镜头、复杂运镜与多主体叙事；无 mini 档，价格全场最贵，确认再上",
       "default_duration": 5,
       "availability": {
         "fal": {
           "endpoint": "bytedance/seedance-2.5/text-to-video",
           "image_endpoint": "bytedance/seedance-2.5/image-to-video",
           "params": {
-            "prompt": "string，必填（其余枚举 docs 待实测）"
+            "prompt": "string，必填",
+            "resolution": ["480p", "720p", "1080p"],
+            "duration": ["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"],
+            "aspect_ratio": ["auto", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"]
           },
           "price_per_second": { "480p": 0.2205, "720p": 0.473, "1080p": 1.164 },
           "price_note": "另有 us 档 $0.5676/s@720p、draft/complete 视频编辑 $1.164/s",
-          "audio": false,
-          "status": "docs-verified 2026-10-10；枚举待实测"
+          "status": "live-verified schema 2026-10-10；出片未实测"
         }
       }
     },
     "h3": {
       "vendor": "MiniMax",
       "model": "Hailuo H3",
-      "best_for": "H3 基础档：唯一支持 2K/4K 输出的 H3 档；图生视频/文生视频均可",
+      "best_for": "H3 基础档：唯一支持 2K/4K 输出的 H3 档；t2v/i2v 均可",
       "default_duration": 6,
       "availability": {
         "fal": {
           "endpoint": "minimax/h3/text-to-video",
           "image_endpoint": "minimax/h3/image-to-video",
           "params": {
-            "prompt": "string，必填（其余枚举 docs 待实测）"
+            "prompt": "string，必填",
+            "resolution": ["480P", "768P", "2K", "4K"],
+            "duration": "int 秒"
           },
-          "price_per_second": { "480p": 0.05, "768p": 0.06, "2k": 0.13, "4k": 0.16 },
-          "audio": false,
-          "status": "docs-verified 2026-10-10；枚举待实测"
+          "price_per_second": { "480P": 0.05, "768P": 0.06, "2K": 0.13, "4K": 0.16 },
+          "audio": true,
+          "audio_note": "同族 turbo 实测输出含音轨，h3 按 H3 家族口径标注",
+          "status": "live-verified schema 2026-10-10；出片未实测"
         }
       }
     },
@@ -133,39 +141,42 @@
           "endpoint": "minimax/h3-max/text-to-video",
           "image_endpoint": "minimax/h3-max/image-to-video",
           "params": {
-            "prompt": "string，必填（其余枚举 docs 待实测）"
+            "prompt": "string，必填",
+            "resolution": ["480P", "768P", "1080P"],
+            "duration": "float 秒（接受小数）"
           },
-          "price_per_second": { "480p": 0.03, "768p": 0.048, "1080p": 0.096 },
-          "price_note": "促销价 40% off 至 2026-10-15，之后 480p $0.05/s、768p $0.08/s、1080p 更高",
-          "audio": false,
-          "status": "docs-verified 2026-10-10；枚举待实测"
+          "price_per_second": { "480P": 0.03, "768P": 0.048, "1080P": 0.096 },
+          "price_note": "促销价 40% off 至 2026-10-15，之后 480P $0.05/s、768P $0.08/s、1080P 更高",
+          "status": "live-verified schema 2026-10-10；出片未实测"
         }
       }
     },
     "h3-max-turbo": {
       "vendor": "MiniMax",
       "model": "Hailuo H3 Max Turbo",
-      "best_for": "【图生视频优先·性价比之王】用户指定 i2v 首选：促销价 $0.015/s@480p，全场最低；实测默认输出 ~6.6s/768p 且自带音轨",
+      "best_for": "【图生视频优先·性价比之王】用户指定 i2v 首选：促销价 $0.015/s@480P 全场最低；实测 13s 出片、输出自带音轨、内置 prompt 扩写",
       "default_duration": 6,
       "availability": {
         "fal": {
           "endpoint": "minimax/h3-max-turbo/text-to-video",
           "image_endpoint": "minimax/h3-max-turbo/image-to-video",
           "params": {
-            "prompt": "string，必填（模型内置 prompt 自动扩写，输出带 expanded_prompt）"
+            "prompt": "string，必填（模型内置 prompt 自动扩写，输出带 expanded_prompt）",
+            "resolution": ["480P", "768P", "1080P"],
+            "duration": "float 秒（接受小数）"
           },
-          "price_per_second": { "480p": 0.015, "768p": 0.024, "1080p": 0.048 },
-          "price_note": "促销价 40% off 至 2026-10-15，之后 480p $0.025/s、768p $0.04/s、1080p $0.08/s",
+          "image_param": "image_url",
+          "price_per_second": { "480P": 0.015, "768P": 0.024, "1080P": 0.048 },
+          "price_note": "促销价 40% off 至 2026-10-15，之后 480P $0.025/s、768P $0.04/s、1080P $0.08/s；无 resolution 时默认 768P（实测）",
           "audio": true,
-          "audio_note": "live 实测 2026-10-10：输出默认含音轨",
-          "status": "submission→成片全链 live-verified 2026-10-10（默认 ~6.59s/1344x768/含音轨；输出 {video:{url,file_size}, expanded_prompt}；参数枚举仍 docs 待回填）"
+          "status": "live-verified 2026-10-10（i2v 全链出片：13s 墙钟，1344x768，含音轨）"
         }
       }
     },
     "omni-flash": {
       "vendor": "Google",
       "model": "Gemini Omni Flash",
-      "best_for": "omni 多模态直出（画面+音频一体，token 计费）；带 edit/reference 端点；优先用 v1.1（计费更透明）",
+      "best_for": "omni 多模态直出（画面+音频一体）；无 resolution 字段（token 计费自动档）；优先用 v1.1（计费更透明）",
       "default_duration": 5,
       "availability": {
         "fal": {
@@ -173,12 +184,14 @@
           "image_endpoint": "google/gemini-omni-flash/image-to-video",
           "edit_endpoint": "google/gemini-omni-flash/edit",
           "params": {
-            "prompt": "string，必填（token 计费，输入文本/音频/视频也计 token：$1.875/M）"
+            "prompt": "string，必填（token 计费，输入文本/音频/视频也计 token：$1.875/M）",
+            "aspect_ratio": ["16:9", "9:16"],
+            "duration": "int 秒"
           },
           "price_per_second": { "720p": 0.125 },
           "price_note": "token 计费近似：输出 $21.875/M tokens ≈ $0.125/s@720p；估算按 5s",
           "audio": true,
-          "status": "docs-verified 2026-10-10；枚举待实测"
+          "status": "live-verified schema 2026-10-10；出片未实测"
         }
       }
     },
@@ -193,11 +206,14 @@
           "image_endpoint": "google/gemini-omni-flash/v1.1/image-to-video",
           "edit_endpoint": "google/gemini-omni-flash/v1.1/edit",
           "params": {
-            "prompt": "string，必填（其余枚举 docs 待实测：pricing 显示 360p/720p/1080p/4k 档）"
+            "prompt": "string，必填",
+            "resolution": ["360p", "720p", "1080p", "4k"],
+            "aspect_ratio": ["16:9", "9:16"],
+            "duration": "int 秒"
           },
           "price_per_second": { "360p": 0.03, "720p": 0.1, "1080p": 0.15, "4k": 0.3 },
           "audio": true,
-          "status": "docs-verified 2026-10-10；枚举待实测"
+          "status": "live-verified schema 2026-10-10；出片未实测"
         }
       }
     }
@@ -211,7 +227,7 @@
         "eleven_multilingual_v2": { "chars_per_credit": 1, "note": "1 credit/字符，中文质量最好，慢" }
       },
       "default_voice": "21m00Tcm4TlvDq8ikWAM",
-      "voice_note": "Rachel（公开音色）。中文内容建议 --list-voices 挑多语音色，或 --voice 直接传 voice_id",
+      "voice_note": "⚠️ 免费档 API 禁用库音色（premade/professional 均 402 paid_plan_required，实测）——先 --list-voices 找 category=generated 的自有音色，--voice 传入；付费档可用全部库音色",
       "output_format": "mp3_44100_128"
     },
     "volc": {

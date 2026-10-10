@@ -10,10 +10,10 @@ for assembly and duration checks).
 
 | Channel | Models | Auth | Billing | Status |
 |---|---|---|---|---|
-| fal.ai (queue API) | `wan30`, `seedance20`, `seedance25`, `h3`, `h3-max`, `h3-max-turbo`, `omni-flash`, `omni-flash-11` | `FAL_KEY` | per second × resolution ($0.015-1.16/s) | queue live-verified; wan30 schema live, others docs-verified |
-| ElevenLabs (TTS) | flash/turbo/multilingual v2.5 | `ELEVENLABS_API_KEY` | free tier 10k chars/mo | live-verified |
+| fal.ai (queue API) | `wan30`, `seedance20`, `seedance25`, `h3`, `h3-max`, `h3-max-turbo`, `omni-flash`, `omni-flash-11` | `FAL_KEY` | per second × resolution ($0.015-1.16/s) | **schemas live-verified**; wan30 + h3-max-turbo full-chain live |
+| ElevenLabs (TTS) | flash/turbo/multilingual v2.5 | `ELEVENLABS_API_KEY` | free tier 10k chars/mo (library voices need paid plan via API) | live-verified (own generated voices) |
 | Volcano 火山 (TTS) | Doubao voices | `VOLC_TTS_API_KEY` + `VOLC_TTS_APPID` | per char | docs-verified, awaiting APPID |
-| Replicate (video) | scaffold | `REPLICATE_API_TOKEN` | GPU time | docs-verified, UNTESTED |
+| Replicate (video) | scaffold | `REPLICATE_API_TOKEN` | GPU time | auth-verified; first real run pending |
 
 > fal.ai is an aggregator: vendor pricing may change (H3 promo rates end
 > 2026-10-15). Generation costs real money per submit — budget gates via

@@ -29,9 +29,11 @@ export async function synthesize({ text, apiKey, voiceId, modelId, speed, output
   });
   if (!r.ok) {
     const t = await r.text();
-    if (r.status === 401) throw new Error("ElevenLabs 401：key 无效（确认 ELEVENLABS_API_KEY）");
-    if (r.status === 402) throw new Error("ElevenLabs 402：字符额度用尽（free 档 10k/月，控制台可查）");
-    throw new Error(`ElevenLabs HTTP ${r.status}: ${t.slice(0, 400)}`);
+    let detail = t.slice(0, 400);
+    try { const j = JSON.parse(t); if (j.detail?.message) detail = `[${j.detail.code ?? j.detail.type}] ${j.detail.message}`; } catch {}
+    if (r.status === 401) throw new Error(`ElevenLabs 401：key 无效（确认 ELEVENLABS_API_KEY）\n${detail}`);
+    if (r.status === 402) throw new Error(`ElevenLabs 402：${detail}\n（常见原因：免费档 API 禁用库音色——用 --list-voices 找 category=generated 的自有音色；或字符额度用尽）`);
+    throw new Error(`ElevenLabs HTTP ${r.status}: ${detail}`);
   }
   const buf = Buffer.from(await r.arrayBuffer());
   return { audio: buf, chars: text.length };

@@ -20,6 +20,10 @@
 ## 工程工艺
 
 - `[live 2026-10-10]` **防误扣费守门（$0.16 学费）**：docs 状态模型上"看起来合法"的参数会被静默丢弃或直通——h3-max-turbo 一发 `--prompt t` 真实出片 6.59s/768p ≈$0.158。gen-video 现已强制：**registry 未登记枚举的字段，用户显式传参即硬报错**（--advanced-json 才是逃生口）。CLI 自测也必须走"死路径"（缺必填/未知别名/非法枚举），绝不能用合法参数打真实提交。
+- `[live 2026-10-10]` **非法枚举探测法在本目录 8/8 模型上有效**（worker 先入队、校验失败 422 不扣费），但**提交到拒绝有几秒窗口**——探测必须带"立即 cancel"保险（本轮 6 连探全 422 零扣费，2 个取消请求来得及）。别假设同族行为一致：同一轮里 h3/h3-max 拒绝而 h3-max-turbo 入队。
+- `[live 2026-10-10]` **fal 队列命名空间 = 端点前两段**（owner/model）：omni-flash-1.1 的 status/response 在 `google/gemini-omni-flash/requests/{id}`，带 `/v1.1` 子路径 405——fal-video.mjs 的 --resume 已按此修正。
+- `[live 2026-10-10]` ElevenLabs 免费档 API **禁用库音色**（402 paid_plan_required，premade/professional 全被拒，与 10k 字符余量无关）；`category=generated` 的自有音色可正常合成。402 ≠ 额度用尽——错误文案必须透传响应体，别想当然。
+- `[live 2026-10-10]` "哑片"假设不可靠：wan30 文档未提音频，实测 t2v 输出含音轨；H3 全系实测含音轨。audio 声明以 ffprobe 实测为准。
 - `[live 2026-10-10]` 探测/测试前先确认矩阵和预算已获用户确认——本仓库首日就因抢跑被用户叫停一次（wan30 那发已批但矩阵未确认）。
 - `[docs]` 图生视频输入：fal 各模型 image 参数名不一（多数 image_url），registry 用 image_param 字段声明；参考视频输入（edit）参数名同样未全验证，首跑小文件试水。
 - `[docs]` BGM 循环铺满用 `-stream_loop -1`；配音对齐视频恒用 `-shortest + apad` 组合（配音短补静音、配音长裁到视频长，画面永不裁）。

@@ -66,11 +66,12 @@ gitignored; video rows carry `est_usd`, TTS rows carry `chars`).
 
 Read `reference/lessons.md` — status markers: `[live]` 实测，`[docs]` 文档核对：
 
-- ⚠️ **fal 队列提交不校验 body**：字段齐全的提交必然真实出片扣费；只有缺必填/非法枚举才被 worker 拒（不扣费）。**永远不要拿"试探请求"去打队列端点**——除非确认其参数非法。
+- ⚠️ **fal 队列提交不校验 body**：字段齐全的提交必然真实出片扣费；只有缺必填/非法枚举才被 worker 拒（不扣费）。**永远不要拿"试探请求"去打队列端点**——除非确认其参数非法，且必须挂"立即 cancel"保险。
 - H3 促销价（40% off）**2026-10-15 截止**，过期后注册表 price 要改。
 - `omni-flash`（v1）是 token 计费（输入文本/音频/视频也计费），预算难估——优先 `omni-flash-11`。
-- 视频编辑（`--video-input`）与 H3-max 的编辑端点均为 docs 状态，首跑先小片试水。
-- 除 wan30 外全部模型参数枚举未实测：registry 里只声明了确认字段，长尾参数走 `--advanced-json`；首跑后把实录枚举回填 registry。
+- 视频编辑（`--video-input`）与 H3-max 的编辑端点仍为 docs 状态，首跑先小片试水。
+- 全部 8 模型枚举已实测回填 registry（2026-10-10）；长尾参数走 `--advanced-json`。
+- ElevenLabs 免费档 API 禁库音色（402）——配音前先 `--list-voices` 选 category=generated 的自有音色。
 - 预算双轴独立：fal 按美元、TTS 按字符，超支 exit 2 与 image/music-forge 同语义。
 
 ## Registry & Extending
