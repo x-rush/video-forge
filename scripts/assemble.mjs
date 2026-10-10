@@ -37,6 +37,8 @@ if (process.argv.includes("--help") || !process.argv[2]) {
   --bgm-volume <倍>   BGM 音量（默认 0.15）
   --clip-volume <倍>  保留原片音轨的音量（默认 0 = 丢弃）
   --fade <秒>         片尾视频淡出（默认 0；会触发视频重编码）
+  --srt <path>        字幕文件（SRT/ASS，烧录进画面；会触发视频重编码）
+  --srt-style <样式>  字幕 force_style（如 "FontName=Microsoft YaHei,FontSize=18"）
   --out <path>        输出（默认 <视频名>-assembled.mp4）`);
   process.exit(0);
 }
@@ -94,9 +96,22 @@ else {
 chains.push(`${audioMap}apad[out]`);
 
 let videoMap = "0:v";
+const videoFilters = [];
 if (fade > 0) {
   if (!vInfo.duration) die("--fade 需要 ffprobe 读到视频时长");
-  chains.unshift(`[0:v]fade=t=out:st=${Math.max(0, vInfo.duration - fade).toFixed(2)}:d=${fade}[vout]`);
+  videoFilters.push(`fade=t=out:st=${Math.max(0, vInfo.duration - fade).toFixed(2)}:d=${fade}`);
+}
+const srtPath = arg("srt");
+if (srtPath) {
+  // ffmpeg 滤镜路径转义：反斜杠→正斜杠、冒号转义；字幕压在淡出之上保持可读
+  const esc = resolve(srtPath).replace(/\\/g, "/").replace(/:/g, "\\:");
+  if (!existsSync(resolve(srtPath))) die(`字幕文件不存在：${srtPath}`);
+  let sub = `subtitles=filename='${esc}'`;
+  if (arg("srt-style")) sub += `:force_style='${arg("srt-style").replace(/'/g, "")}'`;
+  videoFilters.push(sub);
+}
+if (videoFilters.length) {
+  chains.unshift(`[0:v]${videoFilters.join(",")}[vout]`);
   videoMap = "[vout]";
 }
 
@@ -105,7 +120,7 @@ if (bgm) inputs.push("-stream_loop", "-1", "-i", bgm); // BGM 自动循环铺满
 const args = [
   ...inputs, "-filter_complex", chains.join(";"),
   "-map", videoMap, "-map", "[out]",
-  "-c:v", ...(fade > 0 ? ["libx264", "-crf", "18", "-preset", "veryfast"] : ["copy"]),
+  "-c:v", ...(videoFilters.length ? ["libx264", "-crf", "18", "-preset", "veryfast"] : ["copy"]),
   "-c:a", "aac", "-b:a", "192k",
   "-movflags", "+faststart", "-shortest", "-y", out,
 ];

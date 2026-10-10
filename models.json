@@ -238,7 +238,9 @@
       "models": {
         "eleven_flash_v2_5": { "chars_per_credit": 2, "note": "0.5 credit/字符，低延迟，32 语含中文" },
         "eleven_turbo_v2_5": { "chars_per_credit": 2, "note": "0.5 credit/字符，质量/速度均衡" },
-        "eleven_multilingual_v2": { "chars_per_credit": 1, "note": "1 credit/字符，中文质量最好，慢" }
+        "eleven_multilingual_v2": { "chars_per_credit": 1, "note": "1 credit/字符，中文质量最好，慢" },
+        "eleven_v3": { "chars_per_credit": 1, "note": "[docs] 最具表现力：内联音频标签（[laughs]/[whispers]/[excited] 等情绪/语气/语速控制），70+ 语含中文；文本里直接写标签即可；档位可用性未验证，产出有随机性需试听", "audio_tags": true },
+        "eleven_v4": { "chars_per_credit": 1, "note": "[docs] v4 情绪标签 50+（2026-09 文档）；可用性与计费未验证" }
       },
       "default_voice": "21m00Tcm4TlvDq8ikWAM",
       "voice_note": "⚠️ 免费档 API 禁用库音色（premade/professional 均 402 paid_plan_required，实测）——先 --list-voices 找 category=generated 的自有音色，--voice 传入；付费档可用全部库音色",

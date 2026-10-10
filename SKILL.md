@@ -28,7 +28,8 @@ When triggered, the system provides a Base directory (referenced as `<skill>` be
 - `<skill>/scripts/budget.mjs` — spend report + dual-axis monthly budget (video USD / TTS chars)
 - `<skill>/providers/` — channel implementations (fal queue, replicate scaffold, 2× TTS)
 - `<skill>/models.json` — registry: models, endpoints, enums, prices, TTS config
-- `<skill>/reference/` — endpoint contracts, prompting guide and lessons
+- `<skill>/scripts/inspect.mjs` — pre-delivery review (ffprobe summary + evenly-spaced frame extraction)
+- `<skill>/reference/` — endpoint contracts, prompting guide, quality matrix and lessons
 
 ## Quick Start
 
@@ -62,7 +63,7 @@ gitignored; video rows carry `est_usd`, TTS rows carry `chars`).
 3. **Model selection（用户准则 2026-10-10）**: 文生视频与视频编辑 → `wan30`；**图生视频 → `h3-max-turbo`**（i2v 首选，性价比之王）；高质感叙事 → `seedance20`/`seedance25`（贵，确认再上）；带原生音频 → `omni-flash-11`（360p $0.03/s）；2K/4K → `h3`。哑片模型配音走 gen-tts + assemble。
 4. **Prompt & params**: follow `reference/prompting.md` — five-layer prompt structure, per-model do/don'ts, parameter playbook (seed / audio toggles / resolution-tier cost strategy).
 5. **Generate once → validate（ffprobe 时长/分辨率/音轨）→ 交付，让用户确认再迭代。** 每次迭代 = 一次提交 + 一次反馈，不要连环重生成。
-6. **Assembly**: 默认丢弃原片音轨；`--clip-volume` 保留原生音轨（omni/带声模型混配音时用）。
+6. **Assembly**: 默认丢弃原片音轨；`--clip-volume` 保留原生音轨（omni/带声模型混配音时用）；`--srt` 烧录字幕（口播标配）。交付前用 `inspect.mjs` 抽帧审看；各模型画质基准见 `reference/quality-matrix.md`。
 7. **Voiceover language split**: 中文配音 → `--channel volc`（豆包 seed-tts，`_uranus_bigtts` 系音色，复刻加 `--clone`）；英文配音 → `--channel elevenlabs`（免费档只能用自有 generated 音色）。
 
 ## Critical Rules

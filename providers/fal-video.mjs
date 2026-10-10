@@ -66,9 +66,19 @@ export async function generate({ endpoint, params, apiKey, onLog = () => {}, tim
   let st = null;
   while (Date.now() < deadline) {
     await new Promise((r) => setTimeout(r, 5000));
-    const r = await fetch(status_url, { headers: { Authorization: `Key ${apiKey}` }, signal: AbortSignal.timeout(15000) });
-    if (!r.ok) throw new Error(`fal 轮询 HTTP ${r.status}`);
-    st = await r.json();
+    for (let attempt = 1; ; attempt++) {
+      try {
+        const r = await fetch(status_url, { headers: { Authorization: `Key ${apiKey}` }, signal: AbortSignal.timeout(15000) });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        st = await r.json();
+        break;
+      } catch (e) {
+        // 瞬时网络抖动重试（2026-10-10 实测：90s 长轮询中一次 fetch failed 差点弄丢已付费任务）
+        if (attempt >= 3) throw new Error(`轮询连续失败 3 次：${e.message}（request_id=${request_id}，稍后 --resume ${request_id} 重取）`);
+        onLog(`⚠️ 轮询瞬时错误（${attempt}/3）: ${e.message}，5s 后重试`);
+        await new Promise((r2) => setTimeout(r2, 5000));
+      }
+    }
     if (st.status === "COMPLETED") break;
     onLog(`… ${st.status}${st.queue_position != null ? `（队列第 ${st.queue_position} 位）` : ""}`);
   }
