@@ -1,0 +1,7 @@
+scripts/gen-log.jsonl
+scripts/budget.json
+samples/
+video-output/
+tts-output/
+providers/token.txt
+providers/volc-token.txt
