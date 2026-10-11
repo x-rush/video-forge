@@ -81,3 +81,31 @@ export async function generate({ endpoint, params, apiKey, onLog = () => {}, tim
   if (!video_url) throw new Error(`Replicate output 无视频 URL: ${JSON.stringify(out).slice(0, 300)}`);
   return { task_id: pred.id, video_url, raw: pred };
 }
+
+// 中断恢复：凭 prediction id 重取（GET /v1/predictions/{id}，服务端托管不重复扣费）
+export async function resume({ request_id: prediction_id, apiKey, onLog = () => {}, timeoutMs = 600000 }) {
+  const deadline = Date.now() + timeoutMs;
+  let pred = null;
+  while (Date.now() < deadline) {
+    const r = await fetch(`https://api.replicate.com/v1/predictions/${encodeURIComponent(prediction_id)}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(30000),
+    });
+    if (r.status === 404) throw new Error(`prediction 不存在：${prediction_id}`);
+    if (r.status === 401) throw new Error("Replicate 401：token 无效");
+    if (!r.ok) throw new Error(`Replicate 轮询 HTTP ${r.status}`);
+    pred = await r.json();
+    if (["succeeded", "failed", "canceled"].includes(pred.status)) break;
+    onLog(`… ${pred.status}`);
+    await sleep(5000);
+  }
+  if (!pred || pred.status !== "succeeded") {
+    throw new Error(`Replicate 预测未成功（${pred?.status ?? "?"}）：${(pred?.error || "").toString().slice(0, 300)}`);
+  }
+  const out = pred.output;
+  const video_url = typeof out === "string" ? out
+    : Array.isArray(out) ? out.find((u) => typeof u === "string" && /\.(mp4|webm)/i.test(u)) ?? out[0]
+    : out?.video?.url ?? out?.url;
+  if (!video_url) throw new Error(`Replicate output 无视频 URL: ${JSON.stringify(out).slice(0, 300)}`);
+  return { task_id: pred.id, video_url, raw: pred };
+}
