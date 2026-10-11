@@ -59,7 +59,7 @@
           "edit_param": "video_url",
           "edit_status": "docs：reference-to-video 为 video-to-video，输入参数名未实测",
           "params": {
-            "prompt": "string，必填",
+            "prompt": "string，必填 — 画面描述（写什么+怎么动+镜头+光线+风格）",
             "resolution": [
               "480p",
               "720p",
@@ -73,12 +73,12 @@
               "3:4",
               "9:16"
             ],
-            "duration": "int 秒",
-            "seed": "int 复现",
-            "enable_prompt_expansion": "bool（默认 true）",
-            "audio": "bool（默认 true，实测输出含音轨）",
-            "enable_thinking": "bool（默认 false）",
-            "enable_safety_checker": "bool（默认 true）"
+            "duration": "int 秒 — 视频时长（秒）",
+            "seed": "int 复现 — 随机种子（同值同 prompt 可复现）",
+            "enable_prompt_expansion": "bool（默认 true） — 自动扩写 prompt（短句会被模型脑补成完整分镜）",
+            "audio": "bool（默认 true，实测输出含音轨） — 是否生成音轨（true=有声）",
+            "enable_thinking": "bool（默认 false） — 推理模式（更慢但构图更合理）",
+            "enable_safety_checker": "bool（默认 true） — 安全检查器"
           },
           "duration_max": 30,
           "image_param": "image_url",
@@ -112,7 +112,7 @@
           "endpoint": "bytedance/seedance-2.0/text-to-video",
           "image_endpoint": "bytedance/seedance-2.0/image-to-video",
           "params": {
-            "prompt": "string，必填",
+            "prompt": "string，必填 — 画面描述（写什么+怎么动+镜头+光线+风格）",
             "resolution": [
               "480p",
               "720p",
@@ -143,8 +143,8 @@
               "3:4",
               "9:16"
             ],
-            "seed": "int 复现",
-            "generate_audio": "bool（默认 true）",
+            "seed": "int 复现 — 随机种子（同值同 prompt 可复现）",
+            "generate_audio": "bool（默认 true） — 是否生成同步音效/环境声（true=有声）",
             "bitrate_mode": [
               "standard",
               "high"
@@ -201,7 +201,7 @@
           "endpoint": "bytedance/seedance-2.5/text-to-video",
           "image_endpoint": "bytedance/seedance-2.5/image-to-video",
           "params": {
-            "prompt": "string，必填",
+            "prompt": "string，必填 — 画面描述（写什么+怎么动+镜头+光线+风格）",
             "resolution": [
               "480p",
               "720p",
@@ -246,8 +246,8 @@
               "3:4",
               "9:16"
             ],
-            "seed": "int 复现",
-            "generate_audio": "bool（原生音频开关，默认未验）",
+            "seed": "int 复现 — 随机种子（同值同 prompt 可复现）",
+            "generate_audio": "bool（原生音频开关，默认未验） — 是否生成同步音效/环境声（true=有声）",
             "draft": "bool（默认 false，480p 草稿预览→draft_id）",
             "bitrate_mode": [
               "standard",
@@ -292,16 +292,16 @@
           "endpoint": "minimax/h3/text-to-video",
           "image_endpoint": "minimax/h3/image-to-video",
           "params": {
-            "prompt": "string，必填",
+            "prompt": "string，必填 — 画面描述（写什么+怎么动+镜头+光线+风格）",
             "resolution": [
               "480P",
               "768P",
               "2K",
               "4K"
             ],
-            "duration": "int 秒",
-            "seed": "int 复现",
-            "enable_prompt_expansion": "bool",
+            "duration": "int 秒 — 视频时长（秒）",
+            "seed": "int 复现 — 随机种子（同值同 prompt 可复现）",
+            "enable_prompt_expansion": "bool — 自动扩写 prompt（短句会被模型脑补成完整分镜）",
             "resolution_default_note": "schema 默认 768P 系（turbo 实测 768P 输出）"
           },
           "price_per_second": {
@@ -334,15 +334,15 @@
           "endpoint": "minimax/h3-max/text-to-video",
           "image_endpoint": "minimax/h3-max/image-to-video",
           "params": {
-            "prompt": "string，必填",
+            "prompt": "string，必填 — 画面描述（写什么+怎么动+镜头+光线+风格）",
             "resolution": [
               "480P",
               "768P",
               "1080P"
             ],
-            "duration": "float 秒（接受小数）",
-            "seed": "int 复现",
-            "enable_prompt_expansion": "bool",
+            "duration": "float 秒（接受小数） — 视频时长（秒）",
+            "seed": "int 复现 — 随机种子（同值同 prompt 可复现）",
+            "enable_prompt_expansion": "bool — 自动扩写 prompt（短句会被模型脑补成完整分镜）",
             "resolution_default_note": "schema 默认 768P 系（turbo 实测 768P 输出）"
           },
           "price_per_second": {
@@ -401,15 +401,15 @@
           "endpoint": "minimax/h3-max-turbo/text-to-video",
           "image_endpoint": "minimax/h3-max-turbo/image-to-video",
           "params": {
-            "prompt": "string，必填（模型内置 prompt 自动扩写，输出带 expanded_prompt）",
+            "prompt": "string，必填（模型内置 prompt 自动扩写，输出带 expanded_prompt） — 画面描述（写什么+怎么动+镜头+光线+风格）",
             "resolution": [
               "480P",
               "768P",
               "1080P"
             ],
-            "duration": "float 秒（接受小数）",
-            "seed": "int 复现",
-            "enable_prompt_expansion": "bool（实测默认开——扩写全文见输出 expanded_prompt）",
+            "duration": "float 秒（接受小数） — 视频时长（秒）",
+            "seed": "int 复现 — 随机种子（同值同 prompt 可复现）",
+            "enable_prompt_expansion": "bool（实测默认开——扩写全文见输出 expanded_prompt） — 自动扩写 prompt（短句会被模型脑补成完整分镜）",
             "resolution_default_note": "schema 默认 768P 系（turbo 实测 768P 输出）"
           },
           "image_param": "image_url",
@@ -447,7 +447,7 @@
               "16:9",
               "9:16"
             ],
-            "duration": "int 秒",
+            "duration": "int 秒 — 视频时长（秒）",
             "duration_default": 8
           },
           "price_per_second": {
@@ -481,7 +481,7 @@
           "image_endpoint": "google/gemini-omni-flash/v1.1/image-to-video",
           "edit_endpoint": "google/gemini-omni-flash/v1.1/edit",
           "params": {
-            "prompt": "string，必填",
+            "prompt": "string，必填 — 画面描述（写什么+怎么动+镜头+光线+风格）",
             "resolution": [
               "360p",
               "720p",
@@ -492,7 +492,7 @@
               "16:9",
               "9:16"
             ],
-            "duration": "int 秒",
+            "duration": "int 秒 — 视频时长（秒）",
             "duration_default": 8
           },
           "price_per_second": {
