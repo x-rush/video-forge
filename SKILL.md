@@ -75,6 +75,7 @@ Read `reference/lessons.md` — status markers: `[live]` 实测，`[docs]` 文�
 - `omni-flash`（v1）是 token 计费（输入文本/音频/视频也计费），预算难估——优先 `omni-flash-11`。
 - 视频编辑（`--video-input`）与 H3-max 的编辑端点仍为 docs 状态，首跑先小片试水。
 - 全部 8 模型枚举已实测回填 registry（2026-10-10）；长尾参数走 `--advanced-json`。
+- ASR 用 fal-ai/whisper（中英双语，data URI 直塞无需存储上传）；音频 >8MB 先 ffmpeg 切半。豆包 Seed-ASR（更高质量中文）需要 appid+accesskey 对，暂未接入。
 - ElevenLabs 免费档 API 禁库音色（402）——配音前先 `--list-voices` 选 category=generated 的自有音色。
 - 预算双轴独立：fal 按美元、TTS 按字符，超支 exit 2 与 image/music-forge 同语义。
 
