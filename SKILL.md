@@ -51,7 +51,7 @@ node <skill>/scripts/budget.js --check
 
 1. **预算检查**：每次会话首次生成前先 `budget.js --check`。视频单发 $0.09-3，比生图贵一个量级。
 2. **确认意图**（用户已说清则跳过）：① 画面内容与画幅（16:9/9:16）② 时长 ③ 要不要原生音频/配音 ④ 用途平台。
-3. **模型选择（用户准则 2026-10-10）**: 文生视频与视频编辑 → `wan30`；**图生视频 → `h3-max-turbo`**（i2v 首选，性价比之王）；高质感叙事 → `seedance20`/`seedance25`（贵，确认再上）；带原生音频 → `omni-flash-11`（360p $0.03/s）；2K/4K → `h3`。哑片模型配音走 gen-tts + assemble。
+3. **模型选择（选型准则，2026-10-10 实测校准）**: 文生视频与视频编辑 → `wan30`；**图生视频 → `h3-max-turbo`**（i2v 首选，性价比之王）；高质感叙事 → `seedance20`/`seedance25`（贵，确认再上）；带原生音频 → `omni-flash-11`（360p $0.03/s）；2K/4K → `h3`。哑片模型配音走 gen-tts + assemble。
 4. **提示词与参数**：遵循 `reference/prompting.md` — 五层 prompt 结构、分模型 do/don't、参数手册（seed / 音频开关 / 分辨率档位成本策略）。
 5. **一次生成 → 校验（ffprobe 时长/分辨率/音轨）→ 交付，让用户确认再迭代。** 每次迭代 = 一次提交 + 一次反馈，不要连环重生成。
 6. **合成**：默认丢弃原片音轨；`--clip-volume` 保留原生音轨（omni/带声模型混配音时用）；`--srt` 烧录字幕（口播标配）。交付前用 `inspect.js` 抽帧审看；各模型画质基准见 `reference/quality-matrix.md`。
@@ -69,6 +69,7 @@ node <skill>/scripts/budget.js --check
 - 全部 8 模型枚举已实测回填 registry（2026-10-10）；长尾参数走 `--advanced-json`。
 - ASR 用 fal-ai/whisper（中英双语，data URI 直塞无需存储上传）；音频 >8MB 先 ffmpeg 切半。豆包 Seed-ASR（更高质量中文）需要 appid+accesskey 对，暂未接入。
 - ElevenLabs 免费档 API 禁库音色（402）——配音前先 `--list-voices` 选 category=generated 的自有音色。
+- 内容合规：真人肖像/版权素材/商标的使用需获授权；平台要求的 AI 生成标识由使用方负责——提交前自检。
 - 预算双轴独立：fal 按美元、TTS 按字符，超支 exit 2 与 image/music-forge 同语义。
 
 ## 注册表与扩展
