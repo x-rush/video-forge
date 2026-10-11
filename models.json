@@ -75,8 +75,10 @@
             ],
             "duration": "int 秒",
             "seed": "int 复现",
-            "enable_prompt_expansion": "bool",
-            "audio": "bool（实测输出含音轨，此字段疑似音轨开关，默认未验）"
+            "enable_prompt_expansion": "bool（默认 true）",
+            "audio": "bool（默认 true，实测输出含音轨）",
+            "enable_thinking": "bool（默认 false）",
+            "enable_safety_checker": "bool（默认 true）"
           },
           "duration_max": 30,
           "image_param": "image_url",
@@ -87,14 +89,16 @@
           },
           "audio": true,
           "audio_note": "live 实测 2026-10-10：t2v 输出含音轨（内容待试听确认）",
-          "status": "live-verified 2026-10-10（全链出片：480p×5s，854x480，181s 墙钟）",
+          "status": "live-verified 全参数 schema 2026-10-11（openapi.json?endpoint_id= 端点）+ 出片 live；i2v 支持 start/end_image_url 首尾帧；reference 支持 reference_image/video/audio_urls 多模态参考",
           "extra_endpoints": {
             "reference": {
               "path": "alibaba/wan-3.0/reference-to-video",
               "input": "video+prompt",
               "note": "参考视频驱动（[docs] input_value_error，需 video_url+prompt 具体形态未验）"
             }
-          }
+          },
+          "resolution_default_warning": "⚠️ schema 默认 resolution=1080p（$1.00/5s）——省钱必须显式 --resolution 480p（$0.25/5s）",
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     },
@@ -140,7 +144,16 @@
               "9:16"
             ],
             "seed": "int 复现",
-            "generate_audio": "bool（原生音频开关，默认未验）"
+            "generate_audio": "bool（默认 true）",
+            "bitrate_mode": [
+              "standard",
+              "high"
+            ],
+            "codec": [
+              "auto",
+              "H264",
+              "H265"
+            ]
           },
           "price_per_second": {
             "720p": 0.3034
@@ -173,7 +186,8 @@
               "path": "bytedance/seedance-2.0/reference-to-video",
               "input": "image+prompt"
             }
-          }
+          },
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     },
@@ -233,7 +247,17 @@
               "9:16"
             ],
             "seed": "int 复现",
-            "generate_audio": "bool（原生音频开关，默认未验）"
+            "generate_audio": "bool（原生音频开关，默认未验）",
+            "draft": "bool（默认 false，480p 草稿预览→draft_id）",
+            "bitrate_mode": [
+              "standard",
+              "high"
+            ],
+            "codec": [
+              "auto",
+              "H264",
+              "H265"
+            ]
           },
           "price_per_second": {
             "480p": 0.2205,
@@ -253,7 +277,8 @@
               "input": "draft_id+prompt",
               "note": "video-to-video：draft 模式成片，token 计费 $0.0214/1000"
             }
-          }
+          },
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     },
@@ -276,7 +301,8 @@
             ],
             "duration": "int 秒",
             "seed": "int 复现",
-            "enable_prompt_expansion": "bool"
+            "enable_prompt_expansion": "bool",
+            "resolution_default_note": "schema 默认 768P 系（turbo 实测 768P 输出）"
           },
           "price_per_second": {
             "480P": 0.05,
@@ -293,7 +319,8 @@
               "input": "prompt",
               "note": "schema 仅 prompt 必填（参考图参数未验）"
             }
-          }
+          },
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     },
@@ -315,7 +342,8 @@
             ],
             "duration": "float 秒（接受小数）",
             "seed": "int 复现",
-            "enable_prompt_expansion": "bool"
+            "enable_prompt_expansion": "bool",
+            "resolution_default_note": "schema 默认 768P 系（turbo 实测 768P 输出）"
           },
           "price_per_second": {
             "480P": 0.03,
@@ -358,7 +386,8 @@
               "path": "minimax/h3-max/lip-sync/image-to-video",
               "input": "image_url+audio_url"
             }
-          }
+          },
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     },
@@ -380,7 +409,8 @@
             ],
             "duration": "float 秒（接受小数）",
             "seed": "int 复现",
-            "enable_prompt_expansion": "bool（实测默认开——扩写全文见输出 expanded_prompt）"
+            "enable_prompt_expansion": "bool（实测默认开——扩写全文见输出 expanded_prompt）",
+            "resolution_default_note": "schema 默认 768P 系（turbo 实测 768P 输出）"
           },
           "image_param": "image_url",
           "price_per_second": {
@@ -396,7 +426,8 @@
               "path": "minimax/h3-max-turbo/extend-video",
               "input": "video_url+prompt"
             }
-          }
+          },
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     },
@@ -416,7 +447,8 @@
               "16:9",
               "9:16"
             ],
-            "duration": "int 秒"
+            "duration": "int 秒",
+            "duration_default": 8
           },
           "price_per_second": {
             "720p": 0.125
@@ -433,7 +465,8 @@
               "path": "google/gemini-omni-flash/edit",
               "input": "video_url+prompt"
             }
-          }
+          },
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     },
@@ -459,7 +492,8 @@
               "16:9",
               "9:16"
             ],
-            "duration": "int 秒"
+            "duration": "int 秒",
+            "duration_default": 8
           },
           "price_per_second": {
             "360p": 0.03,
@@ -478,7 +512,8 @@
               "path": "google/gemini-omni-flash/v1.1/edit",
               "input": "video_url+prompt"
             }
-          }
+          },
+          "full_params_ref": "reference/endpoint-schemas.json"
         }
       }
     }

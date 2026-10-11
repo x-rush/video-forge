@@ -1,0 +1,2468 @@
+{
+ "wan30-t2v": {
+  "path": "alibaba/wan-3.0/text-to-video",
+  "inputSchema": "Wan30TextToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "duration": {
+    "default": 5,
+    "desc": "Output duration in seconds. Set to null for smart duration, which lets the model pick a le"
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable content moderation for input and output. Disabling it requires account authorizatio"
+   },
+   "seed": {
+    "desc": ""
+   },
+   "enable_thinking": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Enable enhanced reasoning before generation."
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "adaptive",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "adaptive",
+    "desc": "Output aspect ratio, or adaptive selection."
+   },
+   "enable_prompt_expansion": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable intelligent prompt rewriting. Disabling it can save roughly 20-60 seconds of latenc"
+   },
+   "audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Include generated audio."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p"
+    ],
+    "default": "1080p",
+    "desc": "Output video resolution tier."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for the generated video."
+   }
+  }
+ },
+ "wan30-i2v": {
+  "path": "alibaba/wan-3.0/image-to-video",
+  "inputSchema": "Wan30ImageToVideoInput",
+  "required": [
+   "start_image_url"
+  ],
+  "properties": {
+   "duration": {
+    "default": 5,
+    "desc": "Output duration in seconds. Set to null for smart duration, which lets the model pick a le"
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable content moderation for input and output. Disabling it requires account authorizatio"
+   },
+   "seed": {
+    "desc": ""
+   },
+   "enable_thinking": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Enable enhanced reasoning before generation."
+   },
+   "enable_prompt_expansion": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable intelligent prompt rewriting. Disabling it can save roughly 20-60 seconds of latenc"
+   },
+   "end_image_url": {
+    "desc": "Last frame of the generated video. Requires start_image_url."
+   },
+   "audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Include generated audio."
+   },
+   "start_image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "First frame of the generated video."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p"
+    ],
+    "default": "1080p",
+    "desc": "Output video resolution tier."
+   },
+   "prompt": {
+    "desc": "Text prompt describing the motion to generate."
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "adaptive",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "adaptive",
+    "desc": "Output aspect ratio, or adaptive selection."
+   }
+  }
+ },
+ "wan30-ref": {
+  "path": "alibaba/wan-3.0/reference-to-video",
+  "inputSchema": "Wan30ReferenceToVideoInput",
+  "required": [],
+  "properties": {
+   "duration": {
+    "default": 5,
+    "desc": "Output duration in seconds. Set to null for smart duration, which lets the model pick a le"
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable content moderation for input and output. Disabling it requires account authorizatio"
+   },
+   "reference_image_urls": {
+    "type": "array",
+    "desc": "Up to 10 reference image URLs."
+   },
+   "web_url": {
+    "desc": "Public webpage URL to base the video on. Requires enable_thinking=true. Only pages that do"
+   },
+   "seed": {
+    "desc": ""
+   },
+   "enable_thinking": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Enable enhanced reasoning before generation."
+   },
+   "enable_prompt_expansion": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable intelligent prompt rewriting. Disabling it can save roughly 20-60 seconds of latenc"
+   },
+   "reference_video_urls": {
+    "type": "array",
+    "desc": "Up to 5 reference video URLs totaling at most 15 seconds. Each clip must be at least 16 fp"
+   },
+   "audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Include generated audio."
+   },
+   "file_url": {
+    "desc": "Document URL to base the video on. Requires enable_thinking=true."
+   },
+   "reference_audio_urls": {
+    "type": "array",
+    "desc": "Up to 5 reference audio URLs totaling at most 15 seconds."
+   },
+   "prompt": {
+    "desc": "Text prompt directing how the reference media is used. Reference media can be addressed po"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p"
+    ],
+    "default": "1080p",
+    "desc": "Output video resolution tier."
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "adaptive",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "adaptive",
+    "desc": "Output aspect ratio, or adaptive selection."
+   }
+  }
+ },
+ "sd20-t2v": {
+  "path": "bytedance/seedance-2.0/text-to-video",
+  "inputSchema": "Seedance20TextToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt used to generate the video"
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 15 seconds, or auto to let the model decid"
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p",
+     "4k"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance, 1080p for high quality, 4"
+   }
+  }
+ },
+ "sd20-i2v": {
+  "path": "bytedance/seedance-2.0/image-to-video",
+  "inputSchema": "Seedance20ImageToVideoInput",
+  "required": [
+   "prompt",
+   "image_url"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing the desired motion and action for the video."
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 15 seconds, or auto to let the model decid"
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "The URL of the starting frame image to animate. Supported formats: JPEG, PNG, WebP. Max 30"
+   },
+   "end_image_url": {
+    "desc": "The URL of the image to use as the last frame of the video. When provided, the generated v"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p",
+     "4k"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance, 1080p for high quality, 4"
+   }
+  }
+ },
+ "sd20-ref": {
+  "path": "bytedance/seedance-2.0/reference-to-video",
+  "inputSchema": "Seedance20ReferenceToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt used to generate the video."
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 15 seconds, or auto to let the model decid"
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "image_urls": {
+    "type": "array",
+    "desc": "Reference images to guide video generation. Refer to them in the prompt as @Image1, @Image"
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "audio_urls": {
+    "type": "array",
+    "desc": "Reference audio to guide video generation. Refer to them in the prompt as @Audio1, @Audio2"
+   },
+   "video_urls": {
+    "type": "array",
+    "desc": "Reference videos to guide video generation. Refer to them in the prompt as @Video1, @Video"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p",
+     "4k"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance, 1080p for high quality, 4"
+   }
+  }
+ },
+ "sd20fast-t2v": {
+  "path": "bytedance/seedance-2.0/fast/text-to-video",
+  "inputSchema": "Seedance20FastTextToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt used to generate the video"
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 15 seconds, or auto to let the model decid"
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance."
+   }
+  }
+ },
+ "sd20fast-i2v": {
+  "path": "bytedance/seedance-2.0/fast/image-to-video",
+  "inputSchema": "Seedance20FastImageToVideoInput",
+  "required": [
+   "prompt",
+   "image_url"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing the desired motion and action for the video."
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 15 seconds, or auto to let the model decid"
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "The URL of the starting frame image to animate. Supported formats: JPEG, PNG, WebP. Max 30"
+   },
+   "end_image_url": {
+    "desc": "The URL of the image to use as the last frame of the video. When provided, the generated v"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance."
+   }
+  }
+ },
+ "sd20mini-t2v": {
+  "path": "bytedance/seedance-2.0/mini/text-to-video",
+  "inputSchema": "Seedance20MiniTextToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt used to generate the video"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 15 seconds, or auto to let the model decid"
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance."
+   }
+  }
+ },
+ "sd20mini-i2v": {
+  "path": "bytedance/seedance-2.0/mini/image-to-video",
+  "inputSchema": "Seedance20MiniImageToVideoInput",
+  "required": [
+   "prompt",
+   "image_url"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing the desired motion and action for the video."
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "The URL of the starting frame image to animate. Supported formats: JPEG, PNG, WebP. Max 30"
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 15 seconds, or auto to let the model decid"
+   },
+   "end_image_url": {
+    "desc": "The URL of the image to use as the last frame of the video. When provided, the generated v"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance."
+   }
+  }
+ },
+ "sd25-t2v": {
+  "path": "bytedance/seedance-2.5/text-to-video",
+  "inputSchema": "Seedance25TextToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance, 1080p for high quality."
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15",
+     "16",
+     "17",
+     "18",
+     "19",
+     "20",
+     "21",
+     "22",
+     "23",
+     "24",
+     "25",
+     "26",
+     "27",
+     "28",
+     "29",
+     "30"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 30 seconds, or auto to let the model decid"
+   },
+   "draft": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Generate a draft preview at 480p, overriding resolution. Returns a draft_id for completing"
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt used to generate the video"
+   }
+  }
+ },
+ "sd25-i2v": {
+  "path": "bytedance/seedance-2.5/image-to-video",
+  "inputSchema": "Seedance25ImageToVideoInput",
+  "required": [
+   "image_url"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance, 1080p for high quality."
+   },
+   "end_image_url": {
+    "desc": "The URL of the image to use as the last frame of the video. When provided, the generated v"
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "The URL of the starting frame image to animate. Supported formats: JPEG, PNG, WebP. Max 30"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Always \"auto\" for image-to-video"
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15",
+     "16",
+     "17",
+     "18",
+     "19",
+     "20",
+     "21",
+     "22",
+     "23",
+     "24",
+     "25",
+     "26",
+     "27",
+     "28",
+     "29",
+     "30"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 30 seconds, or auto to let the model decid"
+   },
+   "draft": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Generate a draft preview at 480p, overriding resolution. Returns a draft_id for completing"
+   },
+   "prompt": {
+    "desc": "The text prompt describing the desired motion and action for the video."
+   }
+  }
+ },
+ "sd25-ref": {
+  "path": "bytedance/seedance-2.5/reference-to-video",
+  "inputSchema": "Seedance25ReferenceToVideoInput",
+  "required": [],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "720p",
+     "1080p"
+    ],
+    "default": "720p",
+    "desc": "Video resolution - 480p for faster generation, 720p for balance, 1080p for high quality."
+   },
+   "seed": {
+    "desc": "Random seed for reproducibility. Note that results may still vary slightly even with the s"
+   },
+   "video_urls": {
+    "type": "array",
+    "desc": "Reference videos to guide video generation. Refer to them in the prompt as @Video1, @Video"
+   },
+   "generate_audio": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Whether to generate synchronized audio for the video, including sound effects, ambient sou"
+   },
+   "end_user_id": {
+    "desc": "The unique user ID of the end user."
+   },
+   "bitrate_mode": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "high"
+    ],
+    "default": "standard",
+    "desc": "Output bitrate mode. 'high' requests a higher-quality, larger-file encode from the model; "
+   },
+   "audio_urls": {
+    "type": "array",
+    "desc": "Reference audio to guide video generation. Refer to them in the prompt as @Audio1, @Audio2"
+   },
+   "task": {
+    "type": "string",
+    "enum": [
+     "reference",
+     "editing",
+     "extension"
+    ],
+    "default": "reference",
+    "desc": "The type of video generation task. Reference uses the supplied media as guidance. Editing "
+   },
+   "image_urls": {
+    "type": "array",
+    "desc": "Reference images to guide video generation. Refer to them in the prompt as @Image1, @Image"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "The aspect ratio of the generated video. Use 16:9 for landscape, 9:16 for portrait/vertica"
+   },
+   "duration": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15",
+     "16",
+     "17",
+     "18",
+     "19",
+     "20",
+     "21",
+     "22",
+     "23",
+     "24",
+     "25",
+     "26",
+     "27",
+     "28",
+     "29",
+     "30"
+    ],
+    "default": "auto",
+    "desc": "Duration of the video in seconds. Supports 4 to 30 seconds, or auto to let the model decid"
+   },
+   "draft": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Generate a draft preview at 480p, overriding resolution. Returns a draft_id for completing"
+   },
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "prompt": {
+    "desc": "The text prompt used to generate the video."
+   }
+  }
+ },
+ "sd25-draft": {
+  "path": "bytedance/seedance-2.5/draft/complete",
+  "inputSchema": "Seedance25DraftCompleteInput",
+  "required": [
+   "draft_id"
+  ],
+  "properties": {
+   "codec": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "H264",
+     "H265"
+    ],
+    "default": "auto",
+    "desc": "'auto' retains default video codec behaviour; 'H264' uses H.264; 'H265' uses H.265."
+   },
+   "resolution": {
+    "type": "string",
+    "default": "1080p",
+    "desc": "Completed drafts only support 1080p output."
+   },
+   "draft_id": {
+    "type": "string",
+    "req": true,
+    "desc": "The draft_id returned with draft enabled. Valid for seven days and only for the original c"
+   }
+  }
+ },
+ "h3-t2v": {
+  "path": "minimax/h3/text-to-video",
+  "inputSchema": "H3TextToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   },
+   "target_audio_url": {
+    "desc": "Optional URL of an audio clip at least 2 seconds long (maximum 15 MB) to pin to the genera"
+   },
+   "prompt_expansion_mode": {
+    "default": "balanced",
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation"
+   },
+   "duration": {
+    "type": "integer",
+    "default": 5,
+    "desc": "The duration of the video in seconds."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "2K",
+     "4K"
+    ],
+    "default": "2K",
+    "desc": "The resolution of the generated video. 480P and 768P are native generation modes; 2K and 4"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   }
+  }
+ },
+ "h3-i2v": {
+  "path": "minimax/h3/image-to-video",
+  "inputSchema": "H3ImageToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   },
+   "target_audio_url": {
+    "desc": "Optional URL of an audio clip at least 2 seconds long (maximum 15 MB) to pin to the genera"
+   },
+   "prompt_expansion_mode": {
+    "default": "balanced",
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "image_url": {
+    "desc": "Optional URL of the image to use as the first frame. When provided, the output canvas foll"
+   },
+   "duration": {
+    "type": "integer",
+    "default": 5,
+    "desc": "The duration of the video in seconds."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "2K",
+     "4K"
+    ],
+    "default": "2K",
+    "desc": "The resolution of the generated video. 480P and 768P are native generation modes; 2K and 4"
+   },
+   "end_image_url": {
+    "desc": "Optional URL of the image to use as the last frame. It may be provided alone for end-only "
+   }
+  }
+ },
+ "h3-ref": {
+  "path": "minimax/h3/reference-to-video",
+  "inputSchema": "H3ReferenceToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   },
+   "prompt_expansion_mode": {
+    "default": "balanced",
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation. Refer to reference assets by their modality and order in"
+   },
+   "duration": {
+    "type": "integer",
+    "default": 5,
+    "desc": "The duration of the video in seconds."
+   },
+   "reference_video_urls": {
+    "type": "array",
+    "desc": "URLs of motion/reference video clips (2-15 seconds each, combined duration at most 15 seco"
+   },
+   "reference_audio_urls": {
+    "type": "array",
+    "desc": "URLs of reference audio clips (2-15 seconds each, combined duration at most 15 seconds), r"
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "adaptive",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "adaptive",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "reference_image_urls": {
+    "type": "array",
+    "desc": "URLs of subject/style reference images, referenced in the prompt as Image 1, Image 2, and "
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "2K",
+     "4K"
+    ],
+    "default": "2K",
+    "desc": "The resolution of the generated video. 480P and 768P are native generation modes; 2K and 4"
+   }
+  }
+ },
+ "h3max-t2v": {
+  "path": "minimax/h3-max/text-to-video",
+  "inputSchema": "H3MaxTextToVideoInput",
+  "required": [
+   "prompt",
+   "prompt_expansion_mode"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "prompt_expansion_mode": {
+    "type": "string",
+    "default": "balanced",
+    "req": true,
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "target_audio_url": {
+    "desc": "Optional URL of an audio clip at least 2 seconds long (maximum 15 MB) to pin to the genera"
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation"
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Video length in seconds. The output can run up to about 0.7 s longer than requested. Use a"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P"
+    ],
+    "default": "768P",
+    "desc": "The native generation resolution, or 1080P latent refinement from a native 768P source."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   }
+  }
+ },
+ "h3max-i2v": {
+  "path": "minimax/h3-max/image-to-video",
+  "inputSchema": "H3MaxImageToVideoInput",
+  "required": [
+   "prompt",
+   "prompt_expansion_mode"
+  ],
+  "properties": {
+   "prompt_expansion_mode": {
+    "type": "string",
+    "default": "balanced",
+    "req": true,
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "target_audio_url": {
+    "desc": "Optional URL of an audio clip at least 2 seconds long (maximum 15 MB) to pin to the genera"
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "image_url": {
+    "desc": "Optional URL of the image to use as the first frame. When provided, the output canvas foll"
+   },
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation"
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Video length in seconds. The output can run up to about 0.7 s longer than requested. Use a"
+   },
+   "end_image_url": {
+    "desc": "Optional URL of the image to use as the last frame. It may be provided alone for end-only "
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P"
+    ],
+    "default": "768P",
+    "desc": "The native generation resolution, or 1080P latent refinement from a native 768P source."
+   }
+  }
+ },
+ "h3max-ref": {
+  "path": "minimax/h3-max/reference-to-video",
+  "inputSchema": "H3MaxReferenceToVideoInput",
+  "required": [
+   "prompt",
+   "prompt_expansion_mode"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "adaptive",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "adaptive",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "middle_image_url": {
+    "desc": "Optional image to guide the video at middle_frame_time. Requires start and end images and "
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   },
+   "reference_audio_urls": {
+    "type": "array",
+    "desc": "URLs of reference audio clips (2-15 seconds each, combined duration at most 15 seconds), r"
+   },
+   "image_url": {
+    "desc": "Optional URL of the image to use as the first frame. The video opens exactly on this image"
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation. Refer to reference assets by their modality and order in"
+   },
+   "end_image_url": {
+    "desc": "Optional URL of the image to use as the last frame. The video ends exactly on this image."
+   },
+   "reference_image_urls": {
+    "type": "array",
+    "desc": "URLs of subject/style reference images, referenced in the prompt as Image 1, Image 2, and "
+   },
+   "prompt_expansion_mode": {
+    "type": "string",
+    "default": "balanced",
+    "req": true,
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "reference_conditions": {
+    "type": "array",
+    "desc": "Ordered reference list; cross-modality order is semantic and is preserved end-to-end. Do n"
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "reference_video_urls": {
+    "type": "array",
+    "desc": "URLs of motion/reference video clips (2-15 seconds each, combined duration at most 15 seco"
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Video length in seconds. The output can run up to about 0.7 s longer than requested."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P"
+    ],
+    "default": "768P",
+    "desc": "The native generation resolution, or 1080P latent refinement from a native 768P source."
+   },
+   "middle_frame_time": {
+    "desc": "Target time for the middle image, in seconds from the start. Rounded to the nearest frame "
+   }
+  }
+ },
+ "h3max-extend": {
+  "path": "minimax/h3-max/extend-video",
+  "inputSchema": "H3MaxExtendVideoInput",
+  "required": [
+   "video_url",
+   "prompt"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P",
+     "2K"
+    ],
+    "default": "768P",
+    "desc": "Output video resolution."
+   },
+   "enable_prompt_expansion": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Automatically enhance the prompt using the source video to help keep the continuation cons"
+   },
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": "URL of the video to extend. Must be 1.625 s to 60 s long, up to 50 MB, aspect ratio betwee"
+   },
+   "output": {
+    "type": "string",
+    "enum": [
+     "extended",
+     "continuation"
+    ],
+    "default": "extended",
+    "desc": "'extended' returns the source and new footage as one video. 'continuation' returns a clip "
+   },
+   "reference_audio_urls": {
+    "type": "array",
+    "desc": "Optional audio references for the continuation (2–15 seconds each, 15 seconds combined). T"
+   },
+   "seed": {
+    "desc": "Seed for the continuation. Random when omitted."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "What happens next. Describe the continuation, not the source."
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Seconds of new footage to add. The continuation clip also includes 1.625 seconds from the "
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Moderate the source video and the prompt."
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "Output aspect ratio. 'auto' follows the source video. Other values crop the video to fit t"
+   }
+  }
+ },
+ "h3max-relight": {
+  "path": "minimax/h3-max/relight",
+  "inputSchema": "H3MaxRelightInput",
+  "required": [
+   "video_url",
+   "reference_image_url"
+  ],
+  "properties": {
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": "Source video up to 15 seconds long. Converted to constant 24 fps and trimmed at the end to"
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return video as a data URI."
+   },
+   "seed": {
+    "desc": "Random seed for video generation."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable safety checking."
+   },
+   "reference_image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "Sphere render showing the target lighting."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P",
+     "2K"
+    ],
+    "default": "768P",
+    "desc": "Output video resolution. 480P and 768P generate natively; 1080P and 2K (1440p) use latent "
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "adaptive",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "Output video aspect ratio."
+   }
+  }
+ },
+ "h3max-recast": {
+  "path": "minimax/h3-max/recast",
+  "inputSchema": "H3MaxRecastInput",
+  "required": [
+   "video_url",
+   "reference_image_urls"
+  ],
+  "properties": {
+   "seed": {
+    "desc": "Random seed. Leave empty for a random one."
+   },
+   "reference_image_urls": {
+    "type": "array",
+    "req": true,
+    "desc": "One photo per new person. By default they replace the main people in the video from left t"
+   },
+   "prompt": {
+    "desc": "Optional: who becomes whom, or what else to keep or change."
+   },
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": "The source video, 5 to 30 seconds long, with no single shot longer than 15 seconds."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Authorized callers may set false to request relaxed screening."
+   },
+   "enhance_realism": {
+    "type": "boolean",
+    "default": false,
+    "desc": "More natural skin textures and better blending of the new people into the scene. Off unles"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "768P",
+     "1080P"
+    ],
+    "default": "1080P",
+    "desc": ""
+   }
+  }
+ },
+ "h3max-insert": {
+  "path": "minimax/h3-max/insert-video",
+  "inputSchema": "H3MaxInsertVideoInput",
+  "required": [
+   "video_url",
+   "start_time",
+   "resume_time"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480p",
+     "768p"
+    ],
+    "default": "768p",
+    "desc": ""
+   },
+   "enable_prompt_expansion": {
+    "type": "boolean",
+    "default": true,
+    "desc": ""
+   },
+   "prompt": {
+    "desc": ""
+   },
+   "resume_time": {
+    "type": "number",
+    "req": true,
+    "desc": ""
+   },
+   "start_time": {
+    "type": "number",
+    "req": true,
+    "desc": ""
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": ""
+   },
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": ""
+   },
+   "color_match": {
+    "type": "boolean",
+    "default": true,
+    "desc": ""
+   },
+   "reference_image_urls": {
+    "type": "array",
+    "desc": ""
+   },
+   "reference_video_urls": {
+    "type": "array",
+    "desc": ""
+   },
+   "seed": {
+    "desc": ""
+   }
+  }
+ },
+ "h3max-3d": {
+  "path": "minimax/h3-max/3d-to-video",
+  "inputSchema": "H3Max3dToVideoInput",
+  "required": [
+   "video_url"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P"
+    ],
+    "default": "768P",
+    "desc": "Output quality. Duration is taken automatically from the video."
+   },
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": "Blender video, up to 15 seconds and 32 shots, at a public HTTPS URL."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Authorized callers may set false to request relaxed screening."
+   },
+   "max_generated_reference_images": {
+    "type": "integer",
+    "default": 2,
+    "desc": "Maximum NEW images to generate when no reference images are supplied. Ignored when referen"
+   },
+   "reference_image_urls": {
+    "type": "array",
+    "desc": "Optional environment, subject, interior or detail references. When supplied, uses these im"
+   },
+   "prompt": {
+    "desc": "Optional clarification of what your proxies represent or how they move, for example: 'The "
+   }
+  }
+ },
+ "h3max-camera": {
+  "path": "minimax/h3-max/camera-controls",
+  "inputSchema": "H3MaxCameraControlsInput",
+  "required": [
+   "image_url",
+   "prompt_expansion_mode"
+  ],
+  "properties": {
+   "prompt_expansion_mode": {
+    "type": "string",
+    "default": "balanced",
+    "req": true,
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "URL of the image to use as the first frame."
+   },
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "prompt": {
+    "type": "string",
+    "default": "The same elements in the reference are rigid. Preserve every element exactly. The entire scene is frozen. Only the camera moves. no scene motion only camera motion",
+    "desc": "Text prompt for video generation. When omitted or blank, defaults to preserving the frozen"
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Video length in seconds. The output can run up to about 0.7 s longer than requested."
+   },
+   "camera_trajectory": {
+    "type": "array",
+    "desc": "Ordered camera keyframes. The first pose is held before its time and the final pose is hel"
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P"
+    ],
+    "default": "480P",
+    "desc": "The native generation resolution, or 1080P latent refinement from a native 768P source."
+   }
+  }
+ },
+ "h3max-lipsync": {
+  "path": "minimax/h3-max/lip-sync/image-to-video",
+  "inputSchema": "H3MaxLipSyncImageToVideoInput",
+  "required": [
+   "image_url",
+   "audio_url"
+  ],
+  "properties": {
+   "enable_transcription": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Transcribe the supplied audio to guide lip synchronization. When disabled, synchronize to "
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "Image to animate. The aspect ratio must be between 0.4 and 2.5."
+   },
+   "seed": {
+    "desc": "Random seed; selected randomly if omitted."
+   },
+   "audio_url": {
+    "type": "string",
+    "req": true,
+    "desc": "Audio to synchronize the mouth movements to, at least 5 seconds long. Supports up to 15 mi"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P",
+     "2K"
+    ],
+    "default": "768P",
+    "desc": "Output resolution. Uses the supported aspect ratio nearest the image."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Enable content safety checks."
+   }
+  }
+ },
+ "h3turbo-t2v": {
+  "path": "minimax/h3-max-turbo/text-to-video",
+  "inputSchema": "H3MaxTurboTextToVideoInput",
+  "required": [
+   "prompt",
+   "prompt_expansion_mode"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "prompt_expansion_mode": {
+    "type": "string",
+    "default": "balanced",
+    "req": true,
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "target_audio_url": {
+    "desc": "Optional URL of an audio clip at least 2 seconds long (maximum 15 MB) to pin to the genera"
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation"
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Video length in seconds. The output can run up to about 0.7 s longer than requested. Use a"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P"
+    ],
+    "default": "768P",
+    "desc": "The native generation resolution, or 1080P latent refinement from a native 768P source."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   }
+  }
+ },
+ "h3turbo-i2v": {
+  "path": "minimax/h3-max-turbo/image-to-video",
+  "inputSchema": "H3MaxTurboImageToVideoInput",
+  "required": [
+   "prompt",
+   "prompt_expansion_mode"
+  ],
+  "properties": {
+   "prompt_expansion_mode": {
+    "type": "string",
+    "default": "balanced",
+    "req": true,
+    "desc": "How much effort to spend rewriting the prompt before generation. 'disabled' skips prompt e"
+   },
+   "target_audio_url": {
+    "desc": "Optional URL of an audio clip at least 2 seconds long (maximum 15 MB) to pin to the genera"
+   },
+   "sync_mode": {
+    "type": "boolean",
+    "default": false,
+    "desc": "Return the generated video as base64 instead of a CDN URL."
+   },
+   "image_url": {
+    "desc": "Optional URL of the image to use as the first frame. When provided, the output canvas foll"
+   },
+   "seed": {
+    "desc": "Random seed. A random seed is selected when omitted."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "Text prompt for video generation"
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Video length in seconds. The output can run up to about 0.7 s longer than requested. Use a"
+   },
+   "end_image_url": {
+    "desc": "Optional URL of the image to use as the last frame. It may be provided alone for end-only "
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "If set to true, the safety checker will be enabled."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P"
+    ],
+    "default": "768P",
+    "desc": "The native generation resolution, or 1080P latent refinement from a native 768P source."
+   }
+  }
+ },
+ "h3turbo-extend": {
+  "path": "minimax/h3-max-turbo/extend-video",
+  "inputSchema": "H3MaxTurboExtendVideoInput",
+  "required": [
+   "video_url",
+   "prompt"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "480P",
+     "768P",
+     "1080P",
+     "2K"
+    ],
+    "default": "768P",
+    "desc": "Output video resolution."
+   },
+   "enable_prompt_expansion": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Automatically enhance the prompt using the source video to help keep the continuation cons"
+   },
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": "URL of the video to extend. Must be 1.625 s to 60 s long, up to 50 MB, aspect ratio betwee"
+   },
+   "output": {
+    "type": "string",
+    "enum": [
+     "extended",
+     "continuation"
+    ],
+    "default": "extended",
+    "desc": "'extended' returns the source and new footage as one video. 'continuation' returns a clip "
+   },
+   "reference_audio_urls": {
+    "type": "array",
+    "desc": "Optional audio references for the continuation (2–15 seconds each, 15 seconds combined). T"
+   },
+   "seed": {
+    "desc": "Seed for the continuation. Random when omitted."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "What happens next. Describe the continuation, not the source."
+   },
+   "duration": {
+    "type": "number",
+    "default": 5,
+    "desc": "Seconds of new footage to add. The continuation clip also includes 1.625 seconds from the "
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Moderate the source video and the prompt."
+   },
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "21:9",
+     "16:9",
+     "4:3",
+     "1:1",
+     "3:4",
+     "9:16"
+    ],
+    "default": "auto",
+    "desc": "Output aspect ratio. 'auto' follows the source video. Other values crop the video to fit t"
+   }
+  }
+ },
+ "omni-t2v": {
+  "path": "google/gemini-omni-flash",
+  "inputSchema": "GeminiOmniFlashInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "16:9",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "duration": {
+    "type": "integer",
+    "default": 8,
+    "desc": "The duration of the generated video, in seconds."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing the video you want to generate."
+   },
+   "enable_safety_checker": {
+    "type": "boolean",
+    "default": true,
+    "desc": "Authorized callers may set false to request relaxed screening."
+   }
+  }
+ },
+ "omni-i2v": {
+  "path": "google/gemini-omni-flash/image-to-video",
+  "inputSchema": "GeminiOmniFlashImageToVideoInput",
+  "required": [
+   "prompt",
+   "image_url"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "16:9",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "duration": {
+    "type": "integer",
+    "default": 8,
+    "desc": "The duration of the generated video, in seconds."
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "URL of the input image to animate."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing how the image should be animated."
+   }
+  }
+ },
+ "omni-ref": {
+  "path": "google/gemini-omni-flash/reference-to-video",
+  "inputSchema": "GeminiOmniFlashReferenceToVideoInput",
+  "required": [
+   "prompt",
+   "image_urls"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "16:9",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "duration": {
+    "type": "integer",
+    "default": 8,
+    "desc": "The duration of the generated video, in seconds."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing the video. You can bind reference images to roles inline using "
+   },
+   "image_urls": {
+    "type": "array",
+    "req": true,
+    "desc": "URLs of the reference images to incorporate into the video."
+   }
+  }
+ },
+ "omni-edit": {
+  "path": "google/gemini-omni-flash/edit",
+  "inputSchema": "GeminiOmniFlashEditInput",
+  "required": [
+   "prompt",
+   "video_url"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "A simple instruction describing the edit. Simple prompts work best; add \"Keep everything e"
+   },
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": "URL of the video to edit. Note: editing uploaded videos is not available for users in the "
+   }
+  }
+ },
+ "omni11-t2v": {
+  "path": "google/gemini-omni-flash/v1.1/text-to-video",
+  "inputSchema": "GeminiOmniFlashV11TextToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "16:9",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "duration": {
+    "type": "integer",
+    "default": 8,
+    "desc": "The duration of the generated video, in seconds."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing the video you want to generate."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "360p",
+     "720p",
+     "1080p",
+     "4k"
+    ],
+    "default": "720p",
+    "desc": "The resolution of the generated video."
+   }
+  }
+ },
+ "omni11-i2v": {
+  "path": "google/gemini-omni-flash/v1.1/image-to-video",
+  "inputSchema": "GeminiOmniFlashV11ImageToVideoInput",
+  "required": [
+   "prompt",
+   "image_url"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "16:9",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing how the first image should be animated or interpolated into the"
+   },
+   "image_url": {
+    "type": "string",
+    "req": true,
+    "desc": "URL of the first frame to animate."
+   },
+   "duration": {
+    "type": "integer",
+    "default": 8,
+    "desc": "The duration of the generated video, in seconds."
+   },
+   "end_image_url": {
+    "desc": "Optional URL of the end frame. When provided, the model interpolates between the two image"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "360p",
+     "720p",
+     "1080p",
+     "4k"
+    ],
+    "default": "720p",
+    "desc": "The resolution of the generated video."
+   }
+  }
+ },
+ "omni11-ref": {
+  "path": "google/gemini-omni-flash/v1.1/reference-to-video",
+  "inputSchema": "GeminiOmniFlashV11ReferenceToVideoInput",
+  "required": [
+   "prompt"
+  ],
+  "properties": {
+   "aspect_ratio": {
+    "type": "string",
+    "enum": [
+     "16:9",
+     "9:16"
+    ],
+    "default": "16:9",
+    "desc": "The aspect ratio of the generated video."
+   },
+   "image_urls": {
+    "type": "array",
+    "desc": "URLs of reference images to incorporate into the video."
+   },
+   "reference_video_urls": {
+    "type": "array",
+    "desc": "URLs of up to three reference videos. Each video must be at most three seconds long."
+   },
+   "duration": {
+    "type": "integer",
+    "default": 8,
+    "desc": "The duration of the generated video, in seconds."
+   },
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "The text prompt describing the video. Reference media is sent in list order before the pro"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "360p",
+     "720p",
+     "1080p",
+     "4k"
+    ],
+    "default": "720p",
+    "desc": "The resolution of the generated video."
+   }
+  }
+ },
+ "omni11-edit": {
+  "path": "google/gemini-omni-flash/v1.1/edit",
+  "inputSchema": "GeminiOmniFlashV11EditInput",
+  "required": [
+   "prompt",
+   "video_url"
+  ],
+  "properties": {
+   "prompt": {
+    "type": "string",
+    "req": true,
+    "desc": "A simple instruction describing the edit."
+   },
+   "video_url": {
+    "type": "string",
+    "req": true,
+    "desc": "URL of the video to edit."
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "360p",
+     "720p",
+     "1080p",
+     "4k"
+    ],
+    "default": "720p",
+    "desc": "The resolution of the edited video."
+   }
+  }
+ }
+}
