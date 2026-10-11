@@ -55,7 +55,8 @@ node <skill>/scripts/budget.js --check
 4. **提示词与参数**：遵循 `reference/prompting.md` — 五层 prompt 结构、分模型 do/don't、参数手册（seed / 音频开关 / 分辨率档位成本策略）。
 5. **一次生成 → 校验（ffprobe 时长/分辨率/音轨）→ 交付，让用户确认再迭代。** 每次迭代 = 一次提交 + 一次反馈，不要连环重生成。
 6. **合成**：默认丢弃原片音轨；`--clip-volume` 保留原生音轨（omni/带声模型混配音时用）；`--srt` 烧录字幕（口播标配）。交付前用 `inspect.js` 抽帧审看；各模型画质基准见 `reference/quality-matrix.md`。
-7. **配音语言分工**：中文配音 → `--channel volc`（豆包 seed-tts，`_uranus_bigtts` 系音色，复刻加 `--clone`）；英文配音 → `--channel elevenlabs`（免费档只能用自有 generated 音色）。
+7. **扩展端点**：`--use <name>` 调用注册表 `extra_endpoints`（h3-max 的 extend/relight/recast/lipsync、seedance 的 draft/mini/fast 档、omni 的 reference/edit 等，全目录见 endpoints.md）——input 槽位强制校验，防误扣费。
+8. **配音语言分工**：中文配音 → `--channel volc`（豆包 seed-tts，`_uranus_bigtts` 系音色，复刻加 `--clone`）；英文配音 → `--channel elevenlabs`（免费档只能用自有 generated 音色）。
 
 ## 关键规则
 

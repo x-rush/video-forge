@@ -13,7 +13,9 @@
     },
     "replicate": {
       "description": "Replicate 异步预测 API（POST /v1/models/<slug>/predictions + 轮询，与 image-forge 同款通路）",
-      "auth_env": ["REPLICATE_API_TOKEN"],
+      "auth_env": [
+        "REPLICATE_API_TOKEN"
+      ],
       "auth_file": "providers/token.txt",
       "base_url": "https://api.replicate.com/v1",
       "docs": "https://replicate.com/docs",
@@ -32,7 +34,9 @@
     },
     "volc": {
       "description": "火山引擎豆包语音合成 V3（seed-tts unidirectional 流式；豆包负责中文配音，ElevenLabs 负责英文）",
-      "auth_env": ["VOLC_TTS_API_KEY"],
+      "auth_env": [
+        "VOLC_TTS_API_KEY"
+      ],
       "base_url": "https://openspeech.bytedance.com/api/v3",
       "docs": "https://www.volcengine.com/docs/6561/79817",
       "billing": "按字符计费，价格看火山控制台",
@@ -56,8 +60,19 @@
           "edit_status": "docs：reference-to-video 为 video-to-video，输入参数名未实测",
           "params": {
             "prompt": "string，必填",
-            "resolution": ["480p", "720p", "1080p"],
-            "aspect_ratio": ["adaptive", "16:9", "4:3", "1:1", "3:4", "9:16"],
+            "resolution": [
+              "480p",
+              "720p",
+              "1080p"
+            ],
+            "aspect_ratio": [
+              "adaptive",
+              "16:9",
+              "4:3",
+              "1:1",
+              "3:4",
+              "9:16"
+            ],
             "duration": "int 秒",
             "seed": "int 复现",
             "enable_prompt_expansion": "bool",
@@ -65,10 +80,21 @@
           },
           "duration_max": 30,
           "image_param": "image_url",
-          "price_per_second": { "480p": 0.05, "720p": 0.1, "1080p": 0.2 },
+          "price_per_second": {
+            "480p": 0.05,
+            "720p": 0.1,
+            "1080p": 0.2
+          },
           "audio": true,
           "audio_note": "live 实测 2026-10-10：t2v 输出含音轨（内容待试听确认）",
-          "status": "live-verified 2026-10-10（全链出片：480p×5s，854x480，181s 墙钟）"
+          "status": "live-verified 2026-10-10（全链出片：480p×5s，854x480，181s 墙钟）",
+          "extra_endpoints": {
+            "reference": {
+              "path": "alibaba/wan-3.0/reference-to-video",
+              "input": "video+prompt",
+              "note": "参考视频驱动（[docs] input_value_error，需 video_url+prompt 具体形态未验）"
+            }
+          }
         }
       }
     },
@@ -83,15 +109,71 @@
           "image_endpoint": "bytedance/seedance-2.0/image-to-video",
           "params": {
             "prompt": "string，必填",
-            "resolution": ["480p", "720p", "1080p", "4k"],
-            "duration": ["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"],
-            "aspect_ratio": ["auto", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
+            "resolution": [
+              "480p",
+              "720p",
+              "1080p",
+              "4k"
+            ],
+            "duration": [
+              "auto",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15"
+            ],
+            "aspect_ratio": [
+              "auto",
+              "21:9",
+              "16:9",
+              "4:3",
+              "1:1",
+              "3:4",
+              "9:16"
+            ],
             "seed": "int 复现",
             "generate_audio": "bool（原生音频开关，默认未验）"
           },
-          "price_per_second": { "720p": 0.3034 },
+          "price_per_second": {
+            "720p": 0.3034
+          },
           "price_note": "4k/1080p 价未公开，实扣以控制台为准；fast $0.2419/s@720p · mini $0.0721/s@480p · us $0.37/s@720p",
-          "status": "t2v 出片 live（质量矩阵 $1.10，854x480）+ schema live 2026-10-10；i2v/draft 未实测"
+          "status": "t2v 出片 live（质量矩阵 $1.10，854x480）+ schema live 2026-10-10；i2v/draft 未实测",
+          "extra_endpoints": {
+            "fast-t2v": {
+              "path": "bytedance/seedance-2.0/fast/text-to-video",
+              "input": "prompt",
+              "price_note": "fast 档 $0.2419/s@720p"
+            },
+            "fast-i2v": {
+              "path": "bytedance/seedance-2.0/fast/image-to-video",
+              "input": "image+prompt"
+            },
+            "mini-t2v": {
+              "path": "bytedance/seedance-2.0/mini/text-to-video",
+              "input": "prompt",
+              "price_per_second": {
+                "480p": 0.0721,
+                "720p": 0.1547
+              }
+            },
+            "mini-i2v": {
+              "path": "bytedance/seedance-2.0/mini/image-to-video",
+              "input": "image+prompt"
+            },
+            "reference": {
+              "path": "bytedance/seedance-2.0/reference-to-video",
+              "input": "image+prompt"
+            }
+          }
         }
       }
     },
@@ -106,15 +188,72 @@
           "image_endpoint": "bytedance/seedance-2.5/image-to-video",
           "params": {
             "prompt": "string，必填",
-            "resolution": ["480p", "720p", "1080p"],
-            "duration": ["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"],
-            "aspect_ratio": ["auto", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
+            "resolution": [
+              "480p",
+              "720p",
+              "1080p"
+            ],
+            "duration": [
+              "auto",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30"
+            ],
+            "aspect_ratio": [
+              "auto",
+              "21:9",
+              "16:9",
+              "4:3",
+              "1:1",
+              "3:4",
+              "9:16"
+            ],
             "seed": "int 复现",
             "generate_audio": "bool（原生音频开关，默认未验）"
           },
-          "price_per_second": { "480p": 0.2205, "720p": 0.473, "1080p": 1.164 },
+          "price_per_second": {
+            "480p": 0.2205,
+            "720p": 0.473,
+            "1080p": 1.164
+          },
           "price_note": "另有 us 档 $0.5676/s@720p、draft/complete 视频编辑 $1.164/s",
-          "status": "live-verified schema 2026-10-10；出片未实测"
+          "status": "live-verified schema 2026-10-10；出片未实测",
+          "extra_endpoints": {
+            "reference": {
+              "path": "bytedance/seedance-2.5/reference-to-video",
+              "input": "image+prompt",
+              "note": "probe=body input_value_error（需图+词具体形态未验）"
+            },
+            "draft-complete": {
+              "path": "bytedance/seedance-2.5/draft/complete",
+              "input": "draft_id+prompt",
+              "note": "video-to-video：draft 模式成片，token 计费 $0.0214/1000"
+            }
+          }
         }
       }
     },
@@ -129,15 +268,32 @@
           "image_endpoint": "minimax/h3/image-to-video",
           "params": {
             "prompt": "string，必填",
-            "resolution": ["480P", "768P", "2K", "4K"],
+            "resolution": [
+              "480P",
+              "768P",
+              "2K",
+              "4K"
+            ],
             "duration": "int 秒",
             "seed": "int 复现",
             "enable_prompt_expansion": "bool"
           },
-          "price_per_second": { "480P": 0.05, "768P": 0.06, "2K": 0.13, "4K": 0.16 },
+          "price_per_second": {
+            "480P": 0.05,
+            "768P": 0.06,
+            "2K": 0.13,
+            "4K": 0.16
+          },
           "audio": true,
           "audio_note": "同族 turbo 实测输出含音轨，h3 按 H3 家族口径标注",
-          "status": "live-verified schema 2026-10-10；出片未实测"
+          "status": "live-verified schema 2026-10-10；出片未实测",
+          "extra_endpoints": {
+            "reference": {
+              "path": "minimax/h3/reference-to-video",
+              "input": "prompt",
+              "note": "schema 仅 prompt 必填（参考图参数未验）"
+            }
+          }
         }
       }
     },
@@ -152,14 +308,57 @@
           "image_endpoint": "minimax/h3-max/image-to-video",
           "params": {
             "prompt": "string，必填",
-            "resolution": ["480P", "768P", "1080P"],
+            "resolution": [
+              "480P",
+              "768P",
+              "1080P"
+            ],
             "duration": "float 秒（接受小数）",
             "seed": "int 复现",
             "enable_prompt_expansion": "bool"
           },
-          "price_per_second": { "480P": 0.03, "768P": 0.048, "1080P": 0.096 },
+          "price_per_second": {
+            "480P": 0.03,
+            "768P": 0.048,
+            "1080P": 0.096
+          },
           "price_note": "促销价 40% off 至 2026-10-15，之后 480P $0.05/s、768P $0.08/s、1080P 更高",
-          "status": "live-verified schema 2026-10-10；出片未实测"
+          "status": "live-verified schema 2026-10-10；出片未实测",
+          "extra_endpoints": {
+            "reference": {
+              "path": "minimax/h3-max/reference-to-video",
+              "input": "prompt"
+            },
+            "extend": {
+              "path": "minimax/h3-max/extend-video",
+              "input": "video_url+prompt"
+            },
+            "relight": {
+              "path": "minimax/h3-max/relight",
+              "input": "video_url",
+              "note": "空 body 曾被接受并开跑（2026-10-11）——必填字段为 0，慎用"
+            },
+            "recast": {
+              "path": "minimax/h3-max/recast",
+              "input": "video_url+reference_image_urls"
+            },
+            "insert": {
+              "path": "minimax/h3-max/insert-video",
+              "input": "video_url+start_time+resume_time"
+            },
+            "3d": {
+              "path": "minimax/h3-max/3d-to-video",
+              "input": "video_url"
+            },
+            "camera": {
+              "path": "minimax/h3-max/camera-controls",
+              "input": "image_url"
+            },
+            "lipsync": {
+              "path": "minimax/h3-max/lip-sync/image-to-video",
+              "input": "image_url+audio_url"
+            }
+          }
         }
       }
     },
@@ -174,16 +373,30 @@
           "image_endpoint": "minimax/h3-max-turbo/image-to-video",
           "params": {
             "prompt": "string，必填（模型内置 prompt 自动扩写，输出带 expanded_prompt）",
-            "resolution": ["480P", "768P", "1080P"],
+            "resolution": [
+              "480P",
+              "768P",
+              "1080P"
+            ],
             "duration": "float 秒（接受小数）",
             "seed": "int 复现",
             "enable_prompt_expansion": "bool（实测默认开——扩写全文见输出 expanded_prompt）"
           },
           "image_param": "image_url",
-          "price_per_second": { "480P": 0.015, "768P": 0.024, "1080P": 0.048 },
+          "price_per_second": {
+            "480P": 0.015,
+            "768P": 0.024,
+            "1080P": 0.048
+          },
           "price_note": "促销价 40% off 至 2026-10-15，之后 480P $0.025/s、768P $0.04/s、1080P $0.08/s；无 resolution 时默认 768P（实测）",
           "audio": true,
-          "status": "live-verified 2026-10-10（i2v 全链出片：13s 墙钟，1344x768，含音轨）"
+          "status": "live-verified 2026-10-10（i2v 全链出片：13s 墙钟，1344x768，含音轨）",
+          "extra_endpoints": {
+            "extend": {
+              "path": "minimax/h3-max-turbo/extend-video",
+              "input": "video_url+prompt"
+            }
+          }
         }
       }
     },
@@ -199,13 +412,28 @@
           "edit_endpoint": "google/gemini-omni-flash/edit",
           "params": {
             "prompt": "string，必填（token 计费，输入文本/音频/视频也计 token：$1.875/M）",
-            "aspect_ratio": ["16:9", "9:16"],
+            "aspect_ratio": [
+              "16:9",
+              "9:16"
+            ],
             "duration": "int 秒"
           },
-          "price_per_second": { "720p": 0.125 },
+          "price_per_second": {
+            "720p": 0.125
+          },
           "price_note": "token 计费近似：输出 $21.875/M tokens ≈ $0.125/s@720p；估算按 5s",
           "audio": true,
-          "status": "live-verified schema 2026-10-10；出片未实测"
+          "status": "live-verified schema 2026-10-10；出片未实测",
+          "extra_endpoints": {
+            "reference": {
+              "path": "google/gemini-omni-flash/reference-to-video",
+              "input": "image_urls+prompt"
+            },
+            "edit": {
+              "path": "google/gemini-omni-flash/edit",
+              "input": "video_url+prompt"
+            }
+          }
         }
       }
     },
@@ -221,13 +449,36 @@
           "edit_endpoint": "google/gemini-omni-flash/v1.1/edit",
           "params": {
             "prompt": "string，必填",
-            "resolution": ["360p", "720p", "1080p", "4k"],
-            "aspect_ratio": ["16:9", "9:16"],
+            "resolution": [
+              "360p",
+              "720p",
+              "1080p",
+              "4k"
+            ],
+            "aspect_ratio": [
+              "16:9",
+              "9:16"
+            ],
             "duration": "int 秒"
           },
-          "price_per_second": { "360p": 0.03, "720p": 0.1, "1080p": 0.15, "4k": 0.3 },
+          "price_per_second": {
+            "360p": 0.03,
+            "720p": 0.1,
+            "1080p": 0.15,
+            "4k": 0.3
+          },
           "audio": true,
-          "status": "live-verified schema 2026-10-10；出片未实测"
+          "status": "live-verified schema 2026-10-10；出片未实测",
+          "extra_endpoints": {
+            "reference": {
+              "path": "google/gemini-omni-flash/v1.1/reference-to-video",
+              "input": "image_urls+prompt"
+            },
+            "edit": {
+              "path": "google/gemini-omni-flash/v1.1/edit",
+              "input": "video_url+prompt"
+            }
+          }
         }
       }
     }
@@ -236,11 +487,27 @@
     "elevenlabs": {
       "default_model": "eleven_flash_v2_5",
       "models": {
-        "eleven_flash_v2_5": { "chars_per_credit": 2, "note": "0.5 credit/字符，低延迟，32 语含中文" },
-        "eleven_turbo_v2_5": { "chars_per_credit": 2, "note": "0.5 credit/字符，质量/速度均衡" },
-        "eleven_multilingual_v2": { "chars_per_credit": 1, "note": "1 credit/字符，中文质量最好，慢" },
-        "eleven_v3": { "chars_per_credit": 1, "note": "[docs] 最具表现力：内联音频标签（[laughs]/[whispers]/[excited] 等情绪/语气/语速控制），70+ 语含中文；文本里直接写标签即可；档位可用性未验证，产出有随机性需试听", "audio_tags": true },
-        "eleven_v4": { "chars_per_credit": 1, "note": "[docs] v4 情绪标签 50+（2026-09 文档）；可用性与计费未验证" }
+        "eleven_flash_v2_5": {
+          "chars_per_credit": 2,
+          "note": "0.5 credit/字符，低延迟，32 语含中文"
+        },
+        "eleven_turbo_v2_5": {
+          "chars_per_credit": 2,
+          "note": "0.5 credit/字符，质量/速度均衡"
+        },
+        "eleven_multilingual_v2": {
+          "chars_per_credit": 1,
+          "note": "1 credit/字符，中文质量最好，慢"
+        },
+        "eleven_v3": {
+          "chars_per_credit": 1,
+          "note": "[docs] 最具表现力：内联音频标签（[laughs]/[whispers]/[excited] 等情绪/语气/语速控制），70+ 语含中文；文本里直接写标签即可；档位可用性未验证，产出有随机性需试听",
+          "audio_tags": true
+        },
+        "eleven_v4": {
+          "chars_per_credit": 1,
+          "note": "[docs] v4 情绪标签 50+（2026-09 文档）；可用性与计费未验证"
+        }
       },
       "default_voice": "21m00Tcm4TlvDq8ikWAM",
       "voice_note": "⚠️ 免费档 API 禁用库音色（premade/professional 均 402 paid_plan_required，实测）——先 --list-voices 找 category=generated 的自有音色，--voice 传入；付费档可用全部库音色",

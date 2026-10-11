@@ -36,6 +36,7 @@ if (process.argv.includes("--help") || !process.argv[2]) {
   --prompt <text>     画面描述（必填，除非 --resume）
   --image <path>      首帧图（图生视频；吃 image-forge 的出图正好）
   --video-input <path> 参考视频（视频编辑，走 edit_endpoint，docs 状态；与 --image 互斥）
+  --use <name>        调用注册表 extra_endpoints 里的扩展端点（reference/extend/relight/lipsync 等，docs 状态）
   --resolution <档>   分辨率，枚举见各模型（默认取注册表第一档=最便宜）
   --aspect <比例>     画幅，如 16:9 / 9:16 / adaptive
   --duration <秒>     时长（数字；注册表按模型自动转 int / '6' / '6s' 形态）
@@ -59,7 +60,11 @@ if (!channel || !providerDef) die(`模型 ${alias} 未在渠道 ${providerName} 
 const prompt = arg("prompt");
 const imagePath = arg("image");
 const videoInputPath = arg("video-input");
+const audioInputPath = arg("audio");
 if (imagePath && videoInputPath) die("--image 与 --video-input 互斥（一次任务要么首帧图要么参考视频）");
+const useEndpoint = arg("use");
+const extraDef = useEndpoint ? channel.extra_endpoints?.[useEndpoint] : null;
+if (useEndpoint && !extraDef) die(`--use ${useEndpoint} 未在注册表 extra_endpoints 登记（可用：${Object.keys(channel.extra_endpoints ?? {}).join(", ") || "无"}）`);
 const resumeId = arg("resume");
 if (!resumeId && !prompt) die("缺 --prompt（总得告诉它拍什么）");
 if (prompt && prompt.length > 2000) die(`prompt ${prompt.length} 字符过长（视频模型一般 ≤1500），先精简`);
@@ -143,6 +148,14 @@ function buildParams() {
     if (!channel.edit_endpoint) die(`模型 ${alias} 未登记视频编辑端点`);
     p[channel.edit_param ?? "video_url"] = `data:video/mp4;base64,${readFileSync(resolve(videoInputPath)).toString("base64")}`;
   }
+  if (useEndpoint) {
+    // 扩展端点：input 槽位按注册表声明填充（prompt 恒定）
+    const slots = String(extraDef.input ?? "prompt");
+    if (slots.includes("video") && !videoInputPath) die(`--use ${useEndpoint} 需要 --video-input`);
+    if (slots.includes("image") && !imagePath) die(`--use ${useEndpoint} 需要 --image（或 --video-input 视语义）`);
+    if (slots.includes("audio") && !arg("audio")) die(`--use ${useEndpoint} 需要 --audio <音频文件>`);
+    if (slots.includes("audio")) p[extraDef.audio_param ?? "audio_url"] = `data:audio/mpeg;base64,${readFileSync(resolve(arg("audio"))).toString("base64")}`;
+  }
   const advanced = arg("advanced-json") ? JSON.parse(readFileSync(resolve(arg("advanced-json")), "utf8")) : undefined;
   return { ...p, ...advanced };
 }
@@ -188,7 +201,8 @@ try {
     const est = estUsd();
     if (est != null) console.log(`💳 本发估算 $${est.toFixed(2)}（账面口径，实扣以 fal 控制台为准）`);
     budgetCheck(est ?? 0);
-    result = await provider.generate({ endpoint: videoInputPath ? channel.edit_endpoint : imagePath ? channel.image_endpoint : channel.endpoint, params: buildParams(), apiKey, onLog });
+    const useEndpointPath = useEndpoint ? extraDef.path : imagePath ? channel.image_endpoint : channel.endpoint;
+    result = await provider.generate({ endpoint: videoInputPath ? (channel.edit_endpoint ?? die(`模型 ${alias} 未登记视频编辑端点`)) : useEndpointPath, params: buildParams(), apiKey, onLog });
   }
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);

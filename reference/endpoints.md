@@ -70,3 +70,24 @@
 7. ✅ [live] 火山 TTS（豆包 V3 seed-tts）：`zh_female_vv_uranus_bigtts` 出声 4.7s/24 字符；复刻通道 seed-icl-2.0 待用户有复刻音色后验
 8. ✅ [live] music-forge suno-v6 / v6-mini（另一仓库，见其 endpoints.md）
 9. ⏸ seedance/h3/omni 出片未实测（schema 已 live；首跑按预算逐个来，单发 $0.09-2.9）
+
+## 扩展端点全目录 [live 探测 2026-10-11]
+
+> 全部端点已 422 探测必填字段（空 body → worker 校验错误，零扣费）。CLI：`--use <name>`（输入槽位按注册表 `input` 声明强制校验；长尾参数 `--advanced-json`）。
+
+| 端点 | 必填/槽位 | 备注 |
+|---|---|---|
+| wan30 · reference-to-video | video_url + prompt（[docs] input_value_error 具体形态未验） | 参考视频驱动 |
+| seedance20 · base/fast/mini 的 t2v+i2v+ref | t2v/ref: prompt · i2v: prompt+image_url | mini 档 $0.0721/s@480p 全场次低 |
+| seedance25 · i2v | image_url 必填 | ref: body input_value_error（自定义校验，形态未验） |
+| seedance25 · draft/complete | **draft_id** 必填 | video-to-video 成片，token 计费 |
+| h3 · reference-to-video | prompt（image 参数未验） | |
+| h3-max · extend / recast / insert / 3d | video_url（+prompt / +reference_image_urls / +start_time+resume_time / 单 video_url） | 编辑全家桶核心 |
+| h3-max · relight | 空输入曾被接受并开跑（无必填校验，慎用防扣费） | |
+| h3-max · camera-controls | image_url | |
+| h3-max · lip-sync/image-to-video | image_url + audio_url | 口型对齐 |
+| h3-max-turbo · extend-video | video_url + prompt | |
+| omni v1/v1.1 · reference | prompt + image_urls（v1.1 ref 仅 prompt） | |
+| omni v1/v1.1 · edit | prompt + video_url | |
+
+⚠️ `minimax/h3-max/director` 端点不存在（404 Application not found）——fal 模型页列了但 API 无此路径。
