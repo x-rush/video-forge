@@ -29,3 +29,6 @@
 - `[docs]` 图生视频输入：fal 各模型 image 参数名不一（多数 image_url），registry 用 image_param 字段声明；参考视频输入（edit）参数名同样未全验证，首跑小文件试水。
 - `[docs]` BGM 循环铺满用 `-stream_loop -1`；配音对齐视频恒用 `-shortest + apad` 组合（配音短补静音、配音长裁到视频长，画面永不裁）。
 - `[docs]` 预算双轴：视频按 est_usd（注册表价×时长）、TTS 按字符，两把尺子独立，超支 exit 2 与 image/music-forge 同语义。
+- `[live 2026-10-11]` **fal 家族级路由故障判别法**（小拾/MV 场景亲历）：seedance-2.5 全端点曾出现"提交 200 → worker 0.02-0.12s 秒 COMPLETED → response_url 404（Path not found）"，小时级自愈。判别：**用最小合法参数对照重测**——若 worker 返回 422 校验错误 = 平台已恢复（参数/权限问题排除）；若仍 COMPLETED 假象 + 404 = 故障持续。fal 队列把拒绝类也标 COMPLETED 是语义陷阱，必须再 GET response_url 才能定性。
+- `[live 2026-10-11]` seedance-2.5 的 first-last-frame 变体为 **Early Access/B2B**（官方页标注，不在公开 7 变体清单）——首尾帧变形需求用 H3 通道降级方案。family 变体以 fal 模型页实时清单为准（会重构：10-11 出现 us/* 区域档与 draft/complete 新划分）。
+- `[live 2026-10-11]` v3b.fal.media CDN 有周期性 SSL 抖动（10-120s 自愈）——gen-video 下载已加重试 3 次；轮询重试此前已加。同类瞬时错误模式：先重试、后 resume，别急着定性失败。

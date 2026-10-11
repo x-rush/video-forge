@@ -91,14 +91,14 @@
           },
           "price_per_second": { "720p": 0.3034 },
           "price_note": "4k/1080p 价未公开，实扣以控制台为准；fast $0.2419/s@720p · mini $0.0721/s@480p · us $0.37/s@720p",
-          "status": "live-verified schema 2026-10-10；出片未实测"
+          "status": "t2v 出片 live（质量矩阵 $1.10，854x480）+ schema live 2026-10-10；i2v/draft 未实测"
         }
       }
     },
     "seedance25": {
       "vendor": "ByteDance",
       "model": "Seedance 2.5",
-      "best_for": "顶配档：最长 30s 长镜头、复杂运镜与多主体叙事；无 mini 档，价格全场最贵，确认再上",
+      "best_for": "顶配档：最长 30s 长镜头、复杂运镜与多主体叙事；无 mini 档，价格全场最贵，确认再上。⚠️ 2026-10-11 曾发生家族级路由故障（提交 200→COMPLETED 假象→response 404，小时级自愈）；first-last-frame 变体为 EA/B2B 未公开",
       "default_duration": 5,
       "availability": {
         "fal": {

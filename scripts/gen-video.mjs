@@ -195,9 +195,20 @@ try {
   const outDir = resolve(arg("out") || `video-output/${stamp}-${alias}`);
   mkdirSync(outDir, { recursive: true });
   const dest = join(outDir, "video.mp4");
-  const r = await fetch(result.video_url, { signal: AbortSignal.timeout(180000) });
-  if (!r.ok) die(`视频下载失败 HTTP ${r.status}：${result.video_url}`);
-  const buf = Buffer.from(await r.arrayBuffer());
+  // [live 2026-10-11] v3b.fal.media CDN 有周期性 SSL 抖动（10-120s 自愈）——下载重试 3 次
+  let buf = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const r = await fetch(result.video_url, { signal: AbortSignal.timeout(180000) });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      buf = Buffer.from(await r.arrayBuffer());
+      break;
+    } catch (e) {
+      if (attempt >= 3) die(`视频下载连续失败 3 次：${e.message}（产物仍在 CDN，稍后 --resume ${result.task_id} 重取）`);
+      console.log(`⚠️ 下载瞬时错误（${attempt}/3）: ${e.message}，10s 后重试`);
+      await new Promise((r2) => setTimeout(r2, 10000));
+    }
+  }
   if (buf.length < 100 * 1024) console.error(`⚠️ 仅 ${(buf.length / 1024).toFixed(0)}KB，疑似残片，请人工确认`);
   writeFileSync(dest, buf);
   const probe = probeVideo(dest);
