@@ -155,3 +155,38 @@ adv JSON 显式加 `"aspect_ratio": "9:16"`。
 
 双帧拆 2×5s 接力（首→中 / 中→尾，中点帧从 10s 版抽取）——首帧保持力随时长减半而提升。
 但会翻倍生成成本，希望有端点级解法。
+
+
+---
+
+## 【重要更正 2026-10-13 16:21】「首帧采用度实测」附件的根因判断有误
+
+> 上面附件里我推断「双帧模式首帧保持力不足是端点特性」——**判断错误**。
+> 老大核实：h3-max-turbo 的 fal schema 里**根本不存在** first_frame_image / last_frame_image 参数。
+> 正确参数名：**image_url**（首帧）/ **end_image_url**（尾帧）——models.json line 92 自己就登记着
+> "i2v 支持 start/end_image_url 首尾帧"，是我没查注册表、凭 MiniMax 官方 API 直觉写了错误参数名。
+
+### 真实根因链
+
+1. 我在 --advanced-json 里塞了**不存在的参数名**（first_frame_image / last_frame_image）
+2. CLI 的 --advanced-json 逃生口**不校验参数名**（这正是 skill 开发 agent 正在修的"答题卡不检查"问题）
+3. fal 队列提交也不校验 body（models.json 自己写着"校验在 worker 层"）
+4. worker 收到未知参数**静默忽略** → 按 text-to-video 纯 prompt 生成
+5. 结果：无参考图生效（首帧差异 60-117）+ 无 aspect_ratio（横屏 1344x768）——全部对上
+
+### 对 skill 开发 agent 的真实诉求（替代上面"三问"）
+
+上面的"三问"作废（基于错误参数名前提）。真实诉求：
+
+1. **--advanced-json 参数名校验**（已在修）：对登记过 schema 的端点，合并后的请求体键名
+   与 endpoint-schemas.json 比对，未知键名 → 警告或拒绝。本次若有一行
+   "first_frame_image 不在 schema" 的提示，就能省掉 5 段重跑。
+2. **单帧 vs 首尾帧的端点路由**：h3-max-turbo 的 image_endpoint 是 image-to-video（单帧 image_url）；
+   首尾帧（end_image_url）在注册表未登记端点变体（wan30 家族 first-last-frame 为 EA/B2B 未公开）。
+   若 --advanced-json 里出现 end_image_url，CLI 能否提示"该模型未登记首尾帧端点"？
+3. **首尾帧正确用法确认**：h3-max-turbo 上 end_image_url 是否有效？若无效，双帧需求应路由到哪个模型/端点？
+
+### 教训（给所有 agent 的规矩）
+
+**参数名必须从 models.json / reference/endpoint-schemas.json 查证，禁止凭记忆或"官方 API 直觉"。**
+fal 通道提交不校验 body = 错误参数名被静默忽略 = 烧钱无预警——这正是 registry 防误扣费守门存在的原因。

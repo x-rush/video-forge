@@ -67,6 +67,7 @@ const extraDef = useEndpoint ? channel.extra_endpoints?.[useEndpoint] : null;
 if (useEndpoint && !extraDef) die(`--use ${useEndpoint} 未在注册表 extra_endpoints 登记（可用：${Object.keys(channel.extra_endpoints ?? {}).join(", ") || "无"}）`);
 const resumeId = arg("resume");
 if (!resumeId && !prompt && !arg("advanced-json")) die("缺 --prompt（总得告诉它拍什么；用 --advanced-json 时 JSON 内的 prompt 可替代）");
+const dryRun = hasFlag("dry-run"); // 全量校验但不提交（agent 测试 / 用户预检）
 if (prompt && prompt.length > 2000) die(`prompt ${prompt.length} 字符过长（视频模型一般 ≤1500），先精简`);
 
 // ---------- 鉴权（env 优先，退 gitignored token 文件；绝不写入任何文件/日志） ----------
@@ -177,6 +178,14 @@ function buildParams() {
     if (slots.includes("audio")) p[extraDef.audio_param ?? "audio_url"] = `data:audio/mpeg;base64,${readFileSync(resolve(arg("audio"))).toString("base64")}`;
   }
   const advanced = arg("advanced-json") ? JSON.parse(readFileSync(resolve(arg("advanced-json")), "utf8")) : undefined;
+  if (advanced) {
+    // [live 2026-10-13] --advanced-json 透传模式参数名校验：不认识的 key 硬报错
+    // （防"first_frame_image 这类自造参数名被 API 静默忽略→退化成纯文生视频"的事故重演）
+    const known = new Set([...Object.keys(P), "prompt", "image_url", "end_image_url",
+      ...Object.keys(extraDef?.params ?? {})]);
+    const unknown = Object.keys(advanced).filter(k => !known.has(k));
+    if (unknown.length) die(`--advanced-json 含未登记参数名: ${unknown.join(", ")}\n   ${alias} 已知参数: ${[...Object.keys(P), "prompt"].join(", ")}\n   请查 reference/endpoint-schemas.json 确认正确的参数名`);
+  }
   return { ...p, ...advanced };
 }
 
@@ -220,9 +229,15 @@ try {
   } else {
     const est = estUsd();
     if (est != null) console.log(`💳 本发估算 $${est.toFixed(2)}（账面口径，实扣以 fal 控制台为准）`);
-    budgetCheck(est ?? 0);
+    if (!dryRun) budgetCheck(est ?? 0); // dry-run 跳过预算门（纯校验不花钱）
+    const params = buildParams(); // 跑全量校验（枚举守门等）
     const useEndpointPath = useEndpoint ? extraDef.path : imagePath ? channel.image_endpoint : channel.endpoint;
-    result = await provider.generate({ endpoint: videoInputPath ? (channel.edit_endpoint ?? die(`模型 ${alias} 未登记视频编辑端点`)) : useEndpointPath, params: buildParams(), apiKey, onLog });
+    if (dryRun) {
+      console.log(`🧪 DRY RUN — 全量校验通过，未提交。参数面:`);
+      console.log(JSON.stringify({ endpoint: useEndpointPath, params, est_usd: estUsd() }, null, 1));
+      process.exit(0);
+    }
+    result = await provider.generate({ endpoint: videoInputPath ? (channel.edit_endpoint ?? die(`模型 ${alias} 未登记视频编辑端点`)) : useEndpointPath, params, apiKey, onLog });
   }
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
