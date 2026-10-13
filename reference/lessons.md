@@ -33,3 +33,5 @@
 - `[live 2026-10-11]` seedance-2.5 的 first-last-frame 变体为 **Early Access/B2B**（官方页标注，不在公开 7 变体清单）——首尾帧变形需求用 H3 通道降级方案。family 变体以 fal 模型页实时清单为准（会重构：10-11 出现 us/* 区域档与 draft/complete 新划分）。
 - `[live 2026-10-11]` v3b.fal.media CDN 有周期性 SSL 抖动（10-120s 自愈）——gen-video 下载已加重试 3 次；轮询重试此前已加。同类瞬时错误模式：先重试、后 resume，别急着定性失败。
 - `[live 2026-10-11]` 豆包 Seed-ASR 大模型录音识别探测失败（端点 404/凭据不匹配），**已从路线图移除**——whisper 中英双语实测够用，豆包 ASR 不在需求范围内。
+- `[live 2026-10-13]` **首帧宽高比自动匹配**（小拾/MV 双帧场景反馈）：advanced-json 双帧模式下首帧图宽高比不自动跟随——CLI 已补：--image 存在时用 ffprobe 读首帧尺寸，自动匹配最近 aspect_ratio 枚举值（无 --aspect 时）。CLI 传入 --aspect 仍以 CLI 为准。
+- `[live 2026-10-13]` **双帧模式首帧保持力实测**（h3-max-turbo 768P 10s）：aHash 距离 31-117（场景重演绎跨度大）；同模型单帧模式 1-37——**双帧端点首帧权重天然低于单帧**，需高保真首帧时拆 2×5s 接力（成本翻倍）。数据见 BUG-REPORT 追加。

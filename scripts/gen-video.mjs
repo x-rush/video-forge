@@ -113,6 +113,26 @@ function buildParams() {
   } else if (Array.isArray(P.aspect_ratio)) {
     p.aspect_ratio = P.aspect_ratio.includes("16:9") ? "16:9" : P.aspect_ratio[0];
   }
+  // [live 2026-10-13] i2v/双帧模式：首帧图宽高比与 CLI --aspect 不一致时，跟随首帧图比例（与非 advanced 模式行为一致）
+  if (imagePath && !p.aspect_ratio && channel.image_endpoint) {
+    try {
+      const dim = execFileSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0", resolve(imagePath)], { encoding: "utf8" }).trim();
+      const [w, h] = dim.split(",").map(Number);
+      if (w && h) {
+        const ratio = w / h;
+        const candidates = P.aspect_ratio ?? ["16:9", "9:16", "1:1", "4:3", "3:4"];
+        let best = candidates[0], bestDiff = Infinity;
+        for (const c of candidates) {
+          if (c === "auto" || c === "adaptive") continue;
+          const [cw, ch] = c.split(":").map(Number);
+          const diff = Math.abs(cw / ch - ratio);
+          if (diff < bestDiff) { bestDiff = diff; best = c; }
+        }
+        p.aspect_ratio = best;
+        console.log(`📐 首帧图 ${w}x${h} → 自动匹配 aspect_ratio=${best}`);
+      }
+    } catch { console.error("⚠️ 首帧图尺寸读取失败，跳过 aspect 自动匹配"); }
+  }
   const wantDur = arg("duration") ? Number(arg("duration")) : undefined;
   if (wantDur !== undefined) {
     const dEnum = P.duration;
