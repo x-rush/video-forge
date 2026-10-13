@@ -16,6 +16,9 @@ import { execFileSync } from "node:child_process";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SKILL = dirname(HERE);
 const REGISTRY = JSON.parse(readFileSync(join(SKILL, "models.json"), "utf8"));
+// [live 2026-10-13] schema 即守门：38 端点的 fal OpenAPI 存档（path/properties/enum/required 全量）
+// fal 队列提交不校验 body、worker 对未知参数静默忽略——这里不逐键对照，事故必然重演
+const SCHEMAS = JSON.parse(readFileSync(join(SKILL, "reference", "endpoint-schemas.json"), "utf8"));
 const LOG = join(HERE, "gen-log.jsonl");
 const BUDGET = join(HERE, "budget.json");
 
@@ -44,7 +47,7 @@ if (process.argv.includes("--help") || !process.argv[2]) {
   --no-audio          关闭原生音频（veo 系 generate_audio / wan audio / seedance generate_audio）
   --seed N            复现种子（registry 登记了 seed 的模型：wan30/seedance/H3 系）
   --negative <text>   反向提示（仅 klingv3-turbo，docs）
-  --advanced-json <p> 原样合并进请求体的 JSON 文件（长尾参数逃生口）
+  --advanced-json <p> 合并进请求体的 JSON 文件（逐键对照 schema 校验：未知键/枚举违反硬报错；参数名查 reference/endpoint-schemas.json）
   --out <dir>         输出目录（默认 ./video-output/<时间戳>-<别名>/）
   --report            查看账本报表`);
   process.exit(0);
@@ -101,30 +104,40 @@ function buildParams() {
   const P = channel.params ?? {};
   const p = {};
   p.prompt = prompt;
+  // 路由显式化：本发的目标端点在此一处决定（校验/meta/账本共用，杜绝"计划"与"实发"分叉）
+  const routedEndpoint = videoInputPath
+    ? (channel.edit_endpoint ?? die(`模型 ${alias} 未登记视频编辑端点`))
+    : useEndpoint ? extraDef.path
+    : (imagePath || lastImagePath) ? channel.image_endpoint
+    : channel.endpoint;
+  const schemaProps = Object.values(SCHEMAS).find((e) => e.path === routedEndpoint)?.properties ?? null;
+  // schema 已知时以端点 schema 为准；无存档时退回注册表行为（schemaHas 恒真）
+  const schemaHas = (k) => (schemaProps ? k in schemaProps : true);
   // ⚠️ 防误扣费守门：registry 登记了枚举的字段才下发（自动取默认档）；
   // 未登记（docs 状态）时用户显式传参 → 硬报错——合法请求会真实出片扣费，禁止盲传
   const wantRes = arg("resolution");
   if (wantRes) {
     if (!Array.isArray(P.resolution)) die(`--resolution 传入但 ${alias} 的 resolution 枚举未登记（docs 状态禁止盲传——用 --advanced-json 显式传，或首跑实测后回填 registry）`);
     p.resolution = P.resolution.includes(wantRes) ? wantRes : die(`--resolution ${wantRes} 不在 ${alias} 枚举 ${JSON.stringify(P.resolution)} 内`);
-  } else if (Array.isArray(P.resolution)) {
+  } else if (Array.isArray(P.resolution) && schemaHas("resolution")) {
     p.resolution = P.resolution[0]; // 已登记：默认取第一档（注册表按最便宜排序）
   }
   const wantAspect = arg("aspect");
   if (wantAspect) {
     if (!Array.isArray(P.aspect_ratio)) die(`--aspect 传入但 ${alias} 的 aspect_ratio 枚举未登记（docs 状态禁止盲传）`);
     p.aspect_ratio = P.aspect_ratio.includes(wantAspect) ? wantAspect : die(`--aspect ${wantAspect} 不在枚举 ${JSON.stringify(P.aspect_ratio)} 内`);
-  } else if (Array.isArray(P.aspect_ratio)) {
+  } else if (Array.isArray(P.aspect_ratio) && schemaHas("aspect_ratio")) {
     p.aspect_ratio = P.aspect_ratio.includes("16:9") ? "16:9" : P.aspect_ratio[0];
   }
-  // [live 2026-10-13] i2v/双帧模式：首帧图宽高比与 CLI --aspect 不一致时，跟随首帧图比例（与非 advanced 模式行为一致）
-  if (imagePath && !p.aspect_ratio && channel.image_endpoint) {
+  // [live 2026-10-13] i2v/双帧模式：首帧图宽高比与画幅不一致时自动跟随。
+  // 仅当路由端点的 schema 真收 aspect_ratio 才下发（h3 系 i2v 画幅跟随首帧图，schema 无此参数——硬塞会被静默忽略）
+  if ((imagePath || lastImagePath) && !p.aspect_ratio && channel.image_endpoint && schemaProps?.aspect_ratio) {
     try {
       const dim = execFileSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0", resolve(imagePath)], { encoding: "utf8" }).trim();
       const [w, h] = dim.split(",").map(Number);
       if (w && h) {
         const ratio = w / h;
-        const candidates = P.aspect_ratio ?? ["16:9", "9:16", "1:1", "4:3", "3:4"];
+        const candidates = schemaProps.aspect_ratio.enum ?? P.aspect_ratio ?? ["16:9", "9:16", "1:1", "4:3", "3:4"];
         let best = candidates[0], bestDiff = Infinity;
         for (const c of candidates) {
           if (c === "auto" || c === "adaptive") continue;
@@ -149,7 +162,7 @@ function buildParams() {
     } else if (P.duration) p.duration = Math.round(wantDur);
     else die(`--duration 传入但 ${alias} 的 duration 形态未登记（docs 状态禁止盲传）`);
     if (channel.duration_max && p.duration > channel.duration_max) die(`--duration ${p.duration} 超过 ${alias} 上限 ${channel.duration_max}s（[live] 实测）`);
-  } else if (P.duration) {
+  } else if (P.duration && schemaHas("duration")) {
     p.duration = Math.round(modelDef.default_duration ?? 5); // 已登记 duration 字段才自动下发默认时长
   }
   if (hasFlag("no-audio")) {
@@ -188,8 +201,8 @@ function buildParams() {
     if (slots.includes("audio")) p[extraDef.audio_param ?? "audio_url"] = `data:audio/mpeg;base64,${readFileSync(resolve(arg("audio"))).toString("base64")}`;
   }
   const advanced = arg("advanced-json") ? JSON.parse(readFileSync(resolve(arg("advanced-json")), "utf8")) : undefined;
+  // [live 2026-10-13] 实测翻车参数名定向提示（Hailuo 文档名 ≠ fal schema 名，会被静默忽略→退化纯文生视频）
   if (advanced) {
-    // [live 2026-10-13] 实测翻车参数名定向提示（Hailuo 文档名 ≠ fal schema 名，会被静默忽略→退化纯文生视频）
     const wrongNames = {
       first_frame_image: "首帧改用 CLI --image <图>，或 advanced-json 里用 image_url",
       last_frame_image: "尾帧改用 CLI --last-image <图>，或 advanced-json 里用 end_image_url",
@@ -197,20 +210,33 @@ function buildParams() {
     for (const k of Object.keys(advanced)) {
       if (wrongNames[k]) die(`--advanced-json 的 "${k}" 在 fal schema 中不存在，会被静默忽略。${wrongNames[k]}`);
     }
-    // [live 2026-10-13] --advanced-json 透传模式参数名校验：不认识的 key 硬报错
-    // （防"first_frame_image 这类自造参数名被 API 静默忽略→退化成纯文生视频"的事故重演）
-    const known = new Set([...Object.keys(P), "prompt", "image_url", "end_image_url",
-      ...Object.keys(extraDef?.params ?? {})]);
-    const unknown = Object.keys(advanced).filter(k => !known.has(k));
-    if (unknown.length) die(`--advanced-json 含未登记参数名: ${unknown.join(", ")}\n   ${alias} 已知参数: ${[...Object.keys(P), "prompt"].join(", ")}\n   请查 reference/endpoint-schemas.json 确认正确的参数名`);
+  }
+  const params = { ...p, ...advanced };
+  if (advanced) {
     // [live 2026-10-13] 双帧参数必须路由到 i2v 端点：t2v worker 会静默忽略 image_url/end_image_url
     // （S01 事故：参数名改对了但没传 --image → 仍走 text-to-video → 图片参数又被忽略）
     const frameKeys = Object.keys(advanced).filter((k) => k === "image_url" || k === "end_image_url");
-    if (frameKeys.length && !imagePath && !lastImagePath) {
-      die(`--advanced-json 含首/尾帧参数（${frameKeys.join(", ")}）但未传 --image，请求将路由到 text-to-video，图片参数会被 fal 静默忽略。\n   正确用法：--image 首帧.png --last-image 尾帧.png（路由到 image-to-video 端点）`);
+    if (frameKeys.length && routedEndpoint !== channel.image_endpoint) {
+      die(`--advanced-json 含首/尾帧参数（${frameKeys.join(", ")}）但请求将路由到 ${routedEndpoint}，图片参数会被 fal 静默忽略。\n   正确用法：--image 首帧.png --last-image 尾帧.png（路由到 image-to-video 端点）`);
     }
   }
-  return { ...p, ...advanced };
+  // [live 2026-10-13] schema 逐键守门：未知键/枚举违反 → 硬错；required 缺失 → 警告（worker 对带默认值字段自动补全，硬拦会误杀）
+  if (!schemaProps) {
+    console.error(`⚠️ ${routedEndpoint} 无 schema 存档，本发跳过逐键校验——先 --dry-run 人工核对参数面`);
+  } else {
+    const unknown = Object.keys(params).filter((k) => !(k in schemaProps));
+    if (unknown.length) die(`请求体含 ${routedEndpoint} schema 中不存在的参数: ${unknown.join(", ")}（fal 会静默忽略→语义退化）\n   该端点全部参数: ${Object.keys(schemaProps).join(", ")}\n   权威清单: reference/endpoint-schemas.json`);
+    for (const [k, v] of Object.entries(params)) {
+      const def = schemaProps[k];
+      if (def?.enum && v != null && !def.enum.includes(v) && !def.enum.includes(String(v))) {
+        die(`参数 ${k}=${JSON.stringify(v)} 不在 ${routedEndpoint} 的枚举 ${JSON.stringify(def.enum)} 内`);
+      }
+    }
+    const entry = Object.values(SCHEMAS).find((e) => e.path === routedEndpoint);
+    const missing = (entry.required ?? []).filter((k) => !(k in params));
+    if (missing.length) console.error(`⚠️ schema 标记必填但未传: ${missing.join(", ")}（带默认值的字段 worker 会自动补全；若 422 按报错补传）`);
+  }
+  return { params, endpoint: routedEndpoint };
 }
 
 // ---------- 成本估算（注册表价目；账面口径，实扣以 fal 控制台为准） ----------
@@ -247,21 +273,22 @@ const started = Date.now();
 
 try {
   let result;
+  let plan = null; // { endpoint, params } — 本发的完整请求计划（校验产物，meta/账本共用）
   if (resumeId) {
     console.log(`♻️ 重取 fal request ${resumeId}`);
     result = await provider.resume({ request_id: resumeId, endpoint: channel.endpoint, apiKey });
   } else {
     const est = estUsd();
     if (est != null) console.log(`💳 本发估算 $${est.toFixed(2)}（账面口径，实扣以 fal 控制台为准）`);
-    if (!dryRun) budgetCheck(est ?? 0); // dry-run 跳过预算门（纯校验不花钱）
-    const params = buildParams(); // 跑全量校验（枚举守门等）
-    const useEndpointPath = useEndpoint ? extraDef.path : (imagePath || lastImagePath) ? channel.image_endpoint : channel.endpoint;
+    plan = buildParams(); // 全量校验 + schema 逐键守门
     if (dryRun) {
-      console.log(`🧪 DRY RUN — 全量校验通过，未提交。参数面:`);
-      console.log(JSON.stringify({ endpoint: useEndpointPath, params, est_usd: estUsd() }, null, 1));
+      console.log(`🧪 DRY RUN — 校验通过，未提交。请求计划:`);
+      console.log(JSON.stringify({ endpoint: plan.endpoint, params: plan.params, est_usd: est }, null, 1));
       process.exit(0);
     }
-    result = await provider.generate({ endpoint: videoInputPath ? (channel.edit_endpoint ?? die(`模型 ${alias} 未登记视频编辑端点`)) : useEndpointPath, params, apiKey, onLog });
+    budgetCheck(est ?? 0);
+    console.log(`📤 ${plan.endpoint} ← [${Object.keys(plan.params).join(", ")}]`);
+    result = await provider.generate({ endpoint: plan.endpoint, params: plan.params, apiKey, onLog });
   }
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
@@ -289,8 +316,8 @@ try {
 
   writeFileSync(join(outDir, "meta.json"), JSON.stringify({
     skill: "video-forge", channel: providerName, model_alias: alias,
-    endpoint: videoInputPath ? channel.edit_endpoint : (imagePath || lastImagePath) ? channel.image_endpoint : channel.endpoint,
-    task_id: result.task_id, requested: (imagePath || lastImagePath || videoInputPath) ? buildParams() : undefined,
+    endpoint: plan ? plan.endpoint : channel.endpoint,
+    task_id: result.task_id, requested: plan ? plan.params : undefined,
     video_url: result.video_url, file: dest, bytes: buf.length, probe,
     finished_at: new Date().toISOString(), raw: result.raw,
   }, null, 2));
@@ -298,6 +325,7 @@ try {
   const entry = {
     ts: new Date().toISOString(), skill: "video-forge", purpose: "video", channel: providerName,
     model: alias, task_id: result.task_id, est_usd: resumeId ? 0 : estUsd(), seconds: Math.round((Date.now() - started) / 1000),
+    endpoint: plan ? plan.endpoint : channel.endpoint, param_keys: plan ? Object.keys(plan.params) : undefined,
     video_seconds: probe.duration_s ?? null, resolution: probe.width ? `${probe.width}x${probe.height}` : null,
     prompt: (prompt ?? "").slice(0, 80), out_dir: outDir,
   };
