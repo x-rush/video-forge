@@ -34,6 +34,9 @@ node $GEN --model wan30 --prompt "雨夜霓虹街头，慢镜头" --resolution 4
 # 图生视频首选（H3 turbo 促销 $0.015/s → 6s ≈ $0.09）
 node $GEN --model h3-max-turbo --image 首帧.png --prompt "镜头缓缓推进"
 
+# 首尾帧双控（H3 系 i2v 端点原生支持；--last-image 也可单独用=仅定尾帧）
+node $GEN --model h3-max-turbo --image 首帧.png --last-image 尾帧.png --prompt "镜头缓缓推进" --resolution 768P --duration 10
+
 # 原生音频档（Gemini Omni Flash 1.1，360p $0.03/s）
 node $GEN --model omni-flash-11 --prompt "海边日出，海浪声"
 

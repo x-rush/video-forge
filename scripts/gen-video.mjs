@@ -35,6 +35,7 @@ if (process.argv.includes("--help") || !process.argv[2]) {
 生成参数:
   --prompt <text>     画面描述（必填，除非 --resume）
   --image <path>      首帧图（图生视频；吃 image-forge 的出图正好）
+  --last-image <path> 尾帧图（与 --image 搭用=首尾帧双控；也可单独用=仅定尾帧；走 image_endpoint）
   --video-input <path> 参考视频（视频编辑，走 edit_endpoint，docs 状态；与 --image 互斥）
   --use <name>        调用注册表 extra_endpoints 里的扩展端点（reference/extend/relight/lipsync 等，docs 状态）
   --resolution <档>   分辨率，枚举见各模型（默认取注册表第一档=最便宜）
@@ -59,9 +60,11 @@ if (!channel || !providerDef) die(`模型 ${alias} 未在渠道 ${providerName} 
 
 const prompt = arg("prompt");
 const imagePath = arg("image");
+const lastImagePath = arg("last-image");
 const videoInputPath = arg("video-input");
 const audioInputPath = arg("audio");
 if (imagePath && videoInputPath) die("--image 与 --video-input 互斥（一次任务要么首帧图要么参考视频）");
+if (lastImagePath && videoInputPath) die("--last-image 与 --video-input 互斥（尾帧走图生视频端点，不是视频编辑）");
 const useEndpoint = arg("use");
 const extraDef = useEndpoint ? channel.extra_endpoints?.[useEndpoint] : null;
 if (useEndpoint && !extraDef) die(`--use ${useEndpoint} 未在注册表 extra_endpoints 登记（可用：${Object.keys(channel.extra_endpoints ?? {}).join(", ") || "无"}）`);
@@ -165,6 +168,13 @@ function buildParams() {
     if (!mime) die("首帧图只支持 png/jpg/webp");
     p[channel.image_param ?? "image_url"] = `data:${mime};base64,${readFileSync(resolve(imagePath)).toString("base64")}`;
   }
+  if (lastImagePath) {
+    // [live 2026-10-13] 双帧：h3 系 i2v schema 的 end_image_url（可单独用=end-only）
+    if (!channel.image_endpoint) die(`模型 ${alias} 未登记图生视频端点（尾帧与首帧同走 i2v）`);
+    const mime = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp" }[extname(resolve(lastImagePath)).toLowerCase()];
+    if (!mime) die("尾帧图只支持 png/jpg/webp");
+    p[channel.last_image_param ?? "end_image_url"] = `data:${mime};base64,${readFileSync(resolve(lastImagePath)).toString("base64")}`;
+  }
   if (videoInputPath) {
     if (!channel.edit_endpoint) die(`模型 ${alias} 未登记视频编辑端点`);
     p[channel.edit_param ?? "video_url"] = `data:video/mp4;base64,${readFileSync(resolve(videoInputPath)).toString("base64")}`;
@@ -179,12 +189,26 @@ function buildParams() {
   }
   const advanced = arg("advanced-json") ? JSON.parse(readFileSync(resolve(arg("advanced-json")), "utf8")) : undefined;
   if (advanced) {
+    // [live 2026-10-13] 实测翻车参数名定向提示（Hailuo 文档名 ≠ fal schema 名，会被静默忽略→退化纯文生视频）
+    const wrongNames = {
+      first_frame_image: "首帧改用 CLI --image <图>，或 advanced-json 里用 image_url",
+      last_frame_image: "尾帧改用 CLI --last-image <图>，或 advanced-json 里用 end_image_url",
+    };
+    for (const k of Object.keys(advanced)) {
+      if (wrongNames[k]) die(`--advanced-json 的 "${k}" 在 fal schema 中不存在，会被静默忽略。${wrongNames[k]}`);
+    }
     // [live 2026-10-13] --advanced-json 透传模式参数名校验：不认识的 key 硬报错
     // （防"first_frame_image 这类自造参数名被 API 静默忽略→退化成纯文生视频"的事故重演）
     const known = new Set([...Object.keys(P), "prompt", "image_url", "end_image_url",
       ...Object.keys(extraDef?.params ?? {})]);
     const unknown = Object.keys(advanced).filter(k => !known.has(k));
     if (unknown.length) die(`--advanced-json 含未登记参数名: ${unknown.join(", ")}\n   ${alias} 已知参数: ${[...Object.keys(P), "prompt"].join(", ")}\n   请查 reference/endpoint-schemas.json 确认正确的参数名`);
+    // [live 2026-10-13] 双帧参数必须路由到 i2v 端点：t2v worker 会静默忽略 image_url/end_image_url
+    // （S01 事故：参数名改对了但没传 --image → 仍走 text-to-video → 图片参数又被忽略）
+    const frameKeys = Object.keys(advanced).filter((k) => k === "image_url" || k === "end_image_url");
+    if (frameKeys.length && !imagePath && !lastImagePath) {
+      die(`--advanced-json 含首/尾帧参数（${frameKeys.join(", ")}）但未传 --image，请求将路由到 text-to-video，图片参数会被 fal 静默忽略。\n   正确用法：--image 首帧.png --last-image 尾帧.png（路由到 image-to-video 端点）`);
+    }
   }
   return { ...p, ...advanced };
 }
@@ -231,7 +255,7 @@ try {
     if (est != null) console.log(`💳 本发估算 $${est.toFixed(2)}（账面口径，实扣以 fal 控制台为准）`);
     if (!dryRun) budgetCheck(est ?? 0); // dry-run 跳过预算门（纯校验不花钱）
     const params = buildParams(); // 跑全量校验（枚举守门等）
-    const useEndpointPath = useEndpoint ? extraDef.path : imagePath ? channel.image_endpoint : channel.endpoint;
+    const useEndpointPath = useEndpoint ? extraDef.path : (imagePath || lastImagePath) ? channel.image_endpoint : channel.endpoint;
     if (dryRun) {
       console.log(`🧪 DRY RUN — 全量校验通过，未提交。参数面:`);
       console.log(JSON.stringify({ endpoint: useEndpointPath, params, est_usd: estUsd() }, null, 1));
@@ -265,8 +289,8 @@ try {
 
   writeFileSync(join(outDir, "meta.json"), JSON.stringify({
     skill: "video-forge", channel: providerName, model_alias: alias,
-    endpoint: videoInputPath ? channel.edit_endpoint : imagePath ? channel.image_endpoint : channel.endpoint,
-    task_id: result.task_id, requested: (imagePath || videoInputPath) ? buildParams() : undefined,
+    endpoint: videoInputPath ? channel.edit_endpoint : (imagePath || lastImagePath) ? channel.image_endpoint : channel.endpoint,
+    task_id: result.task_id, requested: (imagePath || lastImagePath || videoInputPath) ? buildParams() : undefined,
     video_url: result.video_url, file: dest, bytes: buf.length, probe,
     finished_at: new Date().toISOString(), raw: result.raw,
   }, null, 2));
