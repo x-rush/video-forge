@@ -106,7 +106,7 @@ if (budget?.monthly_usd || budget?.monthly_tts_chars) {
   if (budget.monthly_usd) {
     const pct = (videoSum(month) / budget.monthly_usd) * 100;
     console.log(`fal 月预算：${usd(videoSum(month))}/${usd(budget.monthly_usd)}（${pct.toFixed(0)}%）`);
-    if (pct >= 100) console.log("⛔ 视频已超月预算：继续生成须用户明示同意");
+    if (pct >= 100) console.log("[BLOCKED:BUDGET] ⛔ 视频已超月预算：继续生成须用户明示同意");
     else if (pct >= 80) console.log("⚠️ 已用 ≥80%：生成前提醒余量");
   }
   if (budget.monthly_tts_chars) {

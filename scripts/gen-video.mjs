@@ -66,7 +66,7 @@ const useEndpoint = arg("use");
 const extraDef = useEndpoint ? channel.extra_endpoints?.[useEndpoint] : null;
 if (useEndpoint && !extraDef) die(`--use ${useEndpoint} 未在注册表 extra_endpoints 登记（可用：${Object.keys(channel.extra_endpoints ?? {}).join(", ") || "无"}）`);
 const resumeId = arg("resume");
-if (!resumeId && !prompt) die("缺 --prompt（总得告诉它拍什么）");
+if (!resumeId && !prompt && !arg("advanced-json")) die("缺 --prompt（总得告诉它拍什么；用 --advanced-json 时 JSON 内的 prompt 可替代）");
 if (prompt && prompt.length > 2000) die(`prompt ${prompt.length} 字符过长（视频模型一般 ≤1500），先精简`);
 
 // ---------- 鉴权（env 优先，退 gitignored token 文件；绝不写入任何文件/日志） ----------
@@ -88,7 +88,7 @@ function budgetCheck(estUsd) {
   const now = new Date();
   const spent = entries.filter((e) => { const d = new Date(e.ts); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); }).reduce((s, e) => s + (e.est_usd ?? 0), 0);
   if (spent + estUsd > conf.monthly_usd) {
-    console.error(`⛔ fal 通道本月已花 $${spent.toFixed(2)} / $${conf.monthly_usd}，这一发估算 $${estUsd.toFixed(2)} 会顶破月预算——继续须用户明示同意`); process.exit(2);
+    console.error(`[BLOCKED:BUDGET] ⛔ fal 通道本月已花 $${spent.toFixed(2)} / $${conf.monthly_usd}，这一发估算 $${estUsd.toFixed(2)} 会顶破月预算——继续须用户明示同意`); process.exit(2);
   }
 }
 
